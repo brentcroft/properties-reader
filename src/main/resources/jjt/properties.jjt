@@ -6,26 +6,24 @@ options {
 }
 
 PARSER_BEGIN( PxrParser )
-
 package com.brentcroft.pxr.parser;
+
+import static com.brentcroft.pxr.PxrUtils.nonNull;
+import static com.brentcroft.pxr.PxrUtils.isNull;
 
 import com.brentcroft.pxr.model.PxrComment;
 import com.brentcroft.pxr.model.PxrEntry;
 import com.brentcroft.pxr.model.PxrEntryContinuation;
 import com.brentcroft.pxr.model.PxrProperties;
-import org.xml.sax.SAXException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.format;
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 public class PxrParser
 {
 }
-
 PARSER_END( PxrParser )
 
 TOKEN :
@@ -43,18 +41,7 @@ TOKEN :
     | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " " ] )+ >
 }
 
-
-/** Root production. */
 PxrProperties parse() :
-{
-    PxrProperties rp;
-}
-{
-    rp = footer()
-    { return rp; }
-}
-
-PxrProperties footer() :
 {
     String space = null;
     String init = null;
@@ -88,8 +75,7 @@ PxrProperties footer() :
                             && comment.isEol()
                             && eol
                             && isNull( space )
-                            && isNull( init )
-                            && isNull( key ) )
+                            && isNull( init ) )
                     {
                         comment.setKey( "_header" );
 
@@ -164,7 +150,7 @@ List<PxrEntryContinuation> continuations() :
     boolean eol = false;
     String space = null;
     String value = null;
-    List<PxrEntryContinuation> cont = new ArrayList<>();
+    List<PxrEntryContinuation> cont = new ArrayList<PxrEntryContinuation>();
     int index = 1;
 }
 {

@@ -9,7 +9,8 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.Objects.nonNull;
+import static com.brentcroft.pxr.PxrUtils.nonNull;
+
 
 @Getter
 @Setter
@@ -17,7 +18,7 @@ public class PxrProperties implements PxrItem
 {
     private String systemId = null;
     private PxrComment header;
-    private final List< PxrEntry > entries = new ArrayList<>();
+    private final List< PxrEntry > entries = new ArrayList< PxrEntry >();
     private PxrComment footer;
 
 

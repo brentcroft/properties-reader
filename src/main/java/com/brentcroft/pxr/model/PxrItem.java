@@ -2,18 +2,11 @@ package com.brentcroft.pxr.model;
 
 import org.xml.sax.helpers.AttributesImpl;
 
-import static java.util.Arrays.asList;
-
 public interface PxrItem
 {
     String NAMESPACE_URI = "";
 
-    String TAGS_FOR_CATA_TEXT = String
-            .join(
-                    " ",
-                    asList(
-                            TAG.COMMENT.getTag()
-                    ) );
+    String TAGS_FOR_CATA_TEXT = TAG.COMMENT.getTag();
 
     enum TAG
     {

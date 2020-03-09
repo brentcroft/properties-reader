@@ -9,8 +9,8 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.List;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
+import static com.brentcroft.pxr.PxrUtils.isNull;
+import static com.brentcroft.pxr.PxrUtils.nonNull;
 
 @Getter
 @Setter

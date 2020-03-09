@@ -2,7 +2,6 @@ package com.brentcroft.pxr;
 
 
 import com.brentcroft.pxr.model.AbstractXMLReader;
-import com.brentcroft.pxr.model.PxrItem;
 import com.brentcroft.pxr.model.PxrProperties;
 import com.brentcroft.pxr.parser.ParseException;
 import com.brentcroft.pxr.parser.PxrParser;
@@ -12,13 +11,9 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -92,36 +87,5 @@ public class PxrReader extends AbstractXMLReader
         {
             throw new SAXException( e );
         }
-    }
-
-
-    public static void propertiesTextToXmlText( InputStream inputStream, Writer writer, boolean omitXmlDeclaration ) throws TransformerException
-    {
-        Transformer transformer = SAXTransformerFactory
-                .newInstance()
-                .newTransformer();
-
-        transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
-        transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-
-        if ( omitXmlDeclaration )
-        {
-            transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
-        }
-
-        transformer.setOutputProperty( OutputKeys.CDATA_SECTION_ELEMENTS, PxrItem.TAGS_FOR_CATA_TEXT );
-        transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
-
-        final int indent = 4;
-
-        transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", Integer.toString( indent ) );
-
-        transformer.transform(
-                new SAXSource(
-                        new PxrReader(),
-                        new InputSource( inputStream )
-                ),
-                new StreamResult( writer )
-        );
     }
 }

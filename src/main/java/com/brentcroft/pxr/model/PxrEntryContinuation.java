@@ -7,7 +7,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import static java.util.Objects.nonNull;
+import static com.brentcroft.pxr.PxrUtils.nonNull;
+
 
 @Getter
 @Setter

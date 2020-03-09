@@ -8,8 +8,8 @@ import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 
-import static com.brentcroft.pxr.PxrReader.propertiesTextToXmlText;
-import static com.brentcroft.pxr.PxrWriter.xmlTextToPropertiesText;
+import static com.brentcroft.pxr.PxrUtils.propertiesTextToXmlText;
+import static com.brentcroft.pxr.PxrUtils.xmlTextToPropertiesText;
 
 public class WhenProperties extends Stage< WhenProperties >
 {

@@ -30,16 +30,4 @@ public class GivenProperties extends Stage<GivenProperties>
 
         return self();
     }
-
-
-    public GivenProperties write_text_file( String path, String text ) throws IOException
-    {
-        try ( FileWriter fw = new FileWriter( path ) )
-        {
-            fw.write( text );
-        }
-
-        return self();
-    }
-
 }
