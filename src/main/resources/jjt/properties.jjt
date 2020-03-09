@@ -1,0 +1,244 @@
+
+options {
+    OUTPUT_DIRECTORY = "src/main/java/com/brentcroft/pxr/parser";
+    ERROR_REPORTING = true;
+    STATIC = false;
+}
+
+PARSER_BEGIN( PxrParser )
+
+package com.brentcroft.pxr.parser;
+
+import com.brentcroft.pxr.model.PxrComment;
+import com.brentcroft.pxr.model.PxrEntry;
+import com.brentcroft.pxr.model.PxrEntryContinuation;
+import com.brentcroft.pxr.model.PxrProperties;
+import org.xml.sax.SAXException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.String.format;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
+public class PxrParser
+{
+}
+
+PARSER_END( PxrParser )
+
+TOKEN :
+{
+    <LF: "\n">
+    | <CR: "\r">
+    | <SPACE:  ( " " )+ >
+    | <BANG:  "!" ( <SPACE> )* >
+    | <HASH:  "#" ( <SPACE> )* >
+    | <EQUALS:  "=" >
+    | <COLON:  ":" >
+    // non-standard generous continuation
+    // allows anything (including adjacent backslashes) linebreak
+    | <CONT:  "\\" ( ~[ "\n", "\r", "\\" ] )* >
+    | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " " ] )+ >
+}
+
+
+/** Root production. */
+PxrProperties parse() :
+{
+    PxrProperties rp;
+}
+{
+    rp = footer()
+    { return rp; }
+}
+
+PxrProperties footer() :
+{
+    String space = null;
+    String init = null;
+    String text = null;
+    boolean eol = false;
+    String key = null;
+    String sep = null;
+    PxrComment comment = null;
+    List<PxrEntryContinuation> cont = null;
+    PxrProperties rp = new PxrProperties();
+    int entryIndex = 1;
+}
+{
+    (
+        (
+            (
+                ( eol = eol() )
+                | ( space = space() )
+                | init = initiator() ( LOOKAHEAD(2) text = text() )? ( LOOKAHEAD(2) eol = eol() )?
+                | key = key() ( LOOKAHEAD(2) sep = sep() ( LOOKAHEAD(2) text = text() ( cont = continuations() )? )? )? ( LOOKAHEAD(2) eol = eol() )?
+            )
+            {
+                if ( isNull( key ) )
+                {
+                    if (isNull( comment ))
+                    {
+                        comment = new PxrComment( 0, "_footer", false );
+                    }
+                    else if ( isNull( rp.getHeader() )
+                            && rp.getEntries().isEmpty()
+                            && comment.isEol()
+                            && eol
+                            && isNull( space )
+                            && isNull( init )
+                            && isNull( key ) )
+                    {
+                        comment.setKey( "_header" );
+
+                        rp.setHeader( comment );
+
+                        comment = new PxrComment( 0, "_footer", false );
+                    }
+
+                    comment.ingest( space,  init, text, eol );
+                }
+                else
+                {
+                    if ( nonNull( comment ))
+                    {
+                        comment.setKey( key );
+                    }
+
+                    rp.getEntries().add( new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
+
+                    comment = null;
+                }
+                space = null;
+                init = null;
+                text = null;
+                eol = false;
+                key= null;
+                cont = null;
+            }
+        )+ | <EOF>
+    )
+    {
+        rp.setFooter( comment );
+
+        return rp;
+    }
+}
+
+String initiator() :
+{
+    Token t = null;
+}
+{
+    ( t = <BANG> | t = <HASH> )
+    {
+        return t.image;
+    }
+}
+
+
+String text() :
+{
+    StringBuilder b = new StringBuilder( );
+    Token t = null;
+}
+{
+    (
+        LOOKAHEAD(2)
+        (
+            t = <CHAR>
+            | t = <SPACE>
+        )
+        { b.append( t.image ); }
+    )+
+    {
+        return b.toString();
+    }
+}
+
+List<PxrEntryContinuation> continuations() :
+{
+    Token t = null;
+    boolean eol = false;
+    String space = null;
+    String value = null;
+    List<PxrEntryContinuation> cont = new ArrayList<>();
+    int index = 1;
+}
+{
+    (
+        (
+            t = <CONT>
+            (
+                LOOKAHEAD(2) eol = eol()
+                space = space()
+                ( LOOKAHEAD(2) value = text() )?
+            )?
+            { cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) ); }
+        )
+    )+
+    {
+        return cont;
+    }
+}
+
+
+
+String key() :
+{
+    Token t = null;
+}
+{
+    t = <CHAR>
+    {
+        return t.image;
+    }
+}
+
+
+String sep() :
+{
+    String spaceBefore = null;
+    String spaceAfter = null;
+    Token t = null;
+}
+{
+    (
+        LOOKAHEAD(2) ( ( spaceBefore = space() )? t = <EQUALS> ( LOOKAHEAD(2) spaceAfter = space() )? )
+        | LOOKAHEAD(2) ( ( spaceBefore = space() )? t = <COLON> ( LOOKAHEAD(2) spaceAfter = space() )? )
+        | ( spaceBefore = space() )
+    )
+    {
+        return format(
+                "%s%s%s",
+                nonNull( spaceBefore ) ? spaceBefore : "",
+                nonNull( t ) ? t.image : "",
+                nonNull( spaceAfter ) ? spaceAfter : ""
+        );
+    }
+}
+
+
+
+String space() :
+{
+    Token t = null;
+}
+{
+    t = <SPACE>
+    {
+        return t.image;
+    }
+}
+
+boolean eol() :
+{
+}
+{
+    ( <LF> | ( <CR> <LF> ) )
+    {
+        return true;
+    }
+}
