@@ -18,12 +18,14 @@ public class PxrComment implements PxrItem
     private int linesBefore;
     private String key;
     private boolean eol;
+    private boolean charactersWritten;
+
     private final StringBuilder b = new StringBuilder();
 
     public void emitEntry( ContentHandler contentHandler ) throws SAXException
     {
-        TAG tag = TAG.COMMENT;
-        AttributesImpl atts = new AttributesImpl();
+        final TAG tag = TAG.COMMENT;
+        final AttributesImpl atts = new AttributesImpl();
 
         if ( nonNull( key ) )
         {
@@ -60,6 +62,8 @@ public class PxrComment implements PxrItem
             switchEolOnText();
 
             b.append( space );
+
+            charactersWritten = true;
         }
 
         if ( nonNull( init ) )
@@ -67,6 +71,8 @@ public class PxrComment implements PxrItem
             switchEolOnText();
 
             b.append( init );
+
+            charactersWritten = true;
         }
 
         if ( nonNull( text ) )
@@ -74,26 +80,27 @@ public class PxrComment implements PxrItem
             switchEolOnText();
 
             b.append( text );
+
+            charactersWritten = true;
         }
 
         if ( newEol )
         {
             if ( b.length() == 0 )
             {
-                // absorb empty lines in linesBefore
-                // until text is committed
-                linesBefore++;
-            }
-            else if ( ! eol )
-            {
-                // absorb one more empty line as (temp) local eol
-                eol = true;
+                if ( eol )
+                {
+                    // absorb empty lines in linesBefore
+                    // until text is committed
+                    linesBefore++;
+                }
             }
             else
             {
-                // no where else to go
                 switchEolOnText();
             }
+
+            eol = true;
         }
     }
 
@@ -101,8 +108,15 @@ public class PxrComment implements PxrItem
     {
         if ( eol )
         {
-            eol = false;
-            b.append( "\n" );
+            if ( b.length() == 0 )
+            {
+                linesBefore++;
+            }
+            else
+            {
+                b.append( "\n" );
+            }
         }
+        eol = false;
     }
 }

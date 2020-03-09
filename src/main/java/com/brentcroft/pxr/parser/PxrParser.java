@@ -98,12 +98,13 @@ if ( isNull( key ) )
                 {
                     if (isNull( comment ))
                     {
-                        comment = new PxrComment( 0, "_footer", false );
+                        comment = new PxrComment( 0, "_footer", false, false );
                     }
                     else if ( isNull( rp.getHeader() )
                             && rp.getEntries().isEmpty()
                             && comment.isEol()
                             && eol
+                            && comment.isCharactersWritten()
                             && isNull( space )
                             && isNull( init ) )
                     {
@@ -111,7 +112,7 @@ if ( isNull( key ) )
 
                         rp.setHeader( comment );
 
-                        comment = new PxrComment( 0, "_footer", false );
+                        comment = new PxrComment( 0, "_footer", false, false );
                     }
 
                     comment.ingest( space,  init, text, eol );
@@ -432,12 +433,6 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     finally { jj_save(11, xla); }
   }
 
-  private boolean jj_3_5()
- {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
   private boolean jj_3R_4()
  {
     Token xsp;
@@ -446,6 +441,12 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
       xsp = jj_scanpos;
       if (jj_3_6()) { jj_scanpos = xsp; break; }
     }
+    return false;
+  }
+
+  private boolean jj_3_5()
+ {
+    if (jj_3R_5()) return true;
     return false;
   }
 
@@ -459,15 +460,15 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     return false;
   }
 
-  private boolean jj_3_2()
- {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
   private boolean jj_3_7()
  {
     if (jj_3R_4()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_5()) return true;
     return false;
   }
 
@@ -593,15 +594,6 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     return false;
   }
 
-  private boolean jj_3_4()
- {
-    if (jj_3R_7()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_3()) jj_scanpos = xsp;
-    return false;
-  }
-
   private boolean jj_3_6()
  {
     Token xsp;
@@ -609,6 +601,15 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     if (!jj_scan_token(9)) return false;
     jj_scanpos = xsp;
     if (jj_scan_token(3)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4()
+ {
+    if (jj_3R_7()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_3()) jj_scanpos = xsp;
     return false;
   }
 

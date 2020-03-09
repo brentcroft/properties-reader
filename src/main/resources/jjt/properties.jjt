@@ -68,12 +68,13 @@ PxrProperties parse() :
                 {
                     if (isNull( comment ))
                     {
-                        comment = new PxrComment( 0, "_footer", false );
+                        comment = new PxrComment( 0, "_footer", false, false );
                     }
                     else if ( isNull( rp.getHeader() )
                             && rp.getEntries().isEmpty()
                             && comment.isEol()
                             && eol
+                            && comment.isCharactersWritten()
                             && isNull( space )
                             && isNull( init ) )
                     {
@@ -81,7 +82,7 @@ PxrProperties parse() :
 
                         rp.setHeader( comment );
 
-                        comment = new PxrComment( 0, "_footer", false );
+                        comment = new PxrComment( 0, "_footer", false, false );
                     }
 
                     comment.ingest( space,  init, text, eol );

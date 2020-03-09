@@ -33,7 +33,7 @@ public class LineBreakScenarios extends AbstractScenarios
         runRoundTrip(
                 "\n",
                 "<properties>\n" +
-                        "    <comment key=\"_footer\" lines-before=\"1\" eol=\"0\"/>\n" +
+                        "    <comment key=\"_footer\"/>\n" +
                         "</properties>" );
     }
 
