@@ -42,11 +42,18 @@ public class PxrEntry implements PxrItem
 
         ATTR.INDEX.setAttribute( atts, NAMESPACE_URI, String.valueOf( index ) );
 
-        if ( nonNull( sep ) )
+        if ( isNull( sep ))
+        {
+            sep = "";
+        }
+
+        // ignoring most common case
+        if ( ! "=".equals( sep ) )
         {
             ATTR.SEP.setAttribute( atts, NAMESPACE_URI, sep );
         }
 
+        // ignoring most common case
         if ( ! eol )
         {
             ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );

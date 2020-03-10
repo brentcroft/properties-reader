@@ -16,7 +16,7 @@ public class EntryScenarios extends AbstractScenarios
                 "a",
 
                 "<properties>\n" +
-                        "    <entry key='a' index='1' eol='0'/>\n" +
+                        "    <entry key='a' index='1' sep='' eol='0'/>\n" +
                         "</properties>"
         );
     }
@@ -43,7 +43,7 @@ public class EntryScenarios extends AbstractScenarios
 
                 "<properties>" +
                         "    <comment key='a' eol='0'><![CDATA[ ]]></comment>" +
-                        "    <entry key='a' index='1' eol='0'/>" +
+                        "    <entry key='a' index='1' sep='' eol='0'/>" +
                         "</properties>"
         );
     }
@@ -69,7 +69,7 @@ public class EntryScenarios extends AbstractScenarios
                 "a=b",
 
                 "<properties>" +
-                        "    <entry key='a' index='1' sep='=' eol='0'>b</entry>" +
+                        "    <entry key='a' index='1' eol='0'>b</entry>" +
                         "</properties>"
         );
     }

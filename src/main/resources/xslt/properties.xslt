@@ -37,7 +37,10 @@
             <xsl:with-param name="lines" select="number( @lines-before )"/>
         </xsl:call-template>
         <xsl:value-of select="@key"/>
-        <xsl:if test="@sep"><xsl:value-of select="@sep"/></xsl:if>
+        <xsl:choose>
+            <xsl:when test="@sep"><xsl:value-of select="@sep"/></xsl:when>
+            <xsl:otherwise>=</xsl:otherwise>
+        </xsl:choose>
         <xsl:choose>
             <xsl:when test="text"><xsl:apply-templates select="text"/></xsl:when>
             <xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
