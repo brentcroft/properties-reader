@@ -47,10 +47,10 @@ public class MultiEntryScenarios extends AbstractScenarios
 
                 "<properties>\n" +
                         "    <comment key='x' lines-before='1'/>\n" +
-                        "    <entry key='x' index='1' sep='='>y</entry>\n" +
-                        "    <entry key='y' index='2' sep='='>z</entry>\n" +
-                        "    <entry key='z' index='3' sep='='>a</entry>\n" +
-                        "    <entry key='a' index='4' sep='='>b</entry>\n" +
+                        "    <entry key='x' index='1'>y</entry>\n" +
+                        "    <entry key='y' index='2'>z</entry>\n" +
+                        "    <entry key='z' index='3'>a</entry>\n" +
+                        "    <entry key='a' index='4'>b</entry>\n" +
                         "    <comment key='_footer'/>\n" +
                         "</properties>"
         );
