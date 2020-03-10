@@ -1,7 +1,9 @@
 package com.brentcroft.pxr;
 
 import com.brentcroft.pxr.model.PxrItem;
+import com.brentcroft.pxr.model.PxrProperties;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXSource;
@@ -87,5 +89,34 @@ public class PxrUtils
                 ),
                 new StreamResult( writer )
         );
+    }
+
+    public static PxrProperties getPxrProperties( InputStream inputStream ) throws SAXException
+    {
+        PxrReader reader = new PxrReader();
+
+        reader.parse( new InputSource( inputStream ) );
+
+        return reader.getPxrProperties();
+    }
+
+    public static void pxrPropertiesToText( PxrProperties pxrProperties, Writer writer ) throws TransformerException
+    {
+        if ( isNull( PXR_TEMPLATES ) )
+        {
+            loadRixTemplates();
+        }
+
+        SAXSource saxSource = new SAXSource(
+                new PxrReader(),
+                new PxrInputSource( pxrProperties )
+        );
+
+        PXR_TEMPLATES
+                .newTransformer()
+                .transform(
+                        saxSource,
+                        new StreamResult( writer )
+                );
     }
 }

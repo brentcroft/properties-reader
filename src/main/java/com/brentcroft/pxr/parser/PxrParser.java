@@ -101,7 +101,7 @@ if ( isNull( key ) )
                         comment = new PxrComment( 0, "_footer", false, false );
                     }
                     else if ( isNull( rp.getHeader() )
-                            && rp.getEntries().isEmpty()
+                            && rp.isEmpty()
                             && comment.isEol()
                             && eol
                             && comment.isCharactersWritten()
@@ -124,7 +124,7 @@ if ( isNull( key ) )
                         comment.setKey( key );
                     }
 
-                    rp.getEntries().add( new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
+                    rp.put( key, new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
 
                     comment = null;
                 }

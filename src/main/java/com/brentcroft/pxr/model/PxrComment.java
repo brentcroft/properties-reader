@@ -20,7 +20,7 @@ public class PxrComment implements PxrItem
     private boolean eol;
     private boolean charactersWritten;
 
-    private final StringBuilder b = new StringBuilder();
+    private final StringBuilder value = new StringBuilder();
 
     public void emitEntry( ContentHandler contentHandler ) throws SAXException
     {
@@ -44,9 +44,9 @@ public class PxrComment implements PxrItem
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
 
-        if ( b.length() > 0 )
+        if ( value.length() > 0 )
         {
-            char[] characters = b.toString().toCharArray();
+            char[] characters = value.toString().toCharArray();
 
             contentHandler.characters( characters, 0, characters.length );
         }
@@ -61,7 +61,7 @@ public class PxrComment implements PxrItem
         {
             switchEolOnText();
 
-            b.append( space );
+            value.append( space );
 
             charactersWritten = true;
         }
@@ -70,7 +70,7 @@ public class PxrComment implements PxrItem
         {
             switchEolOnText();
 
-            b.append( init );
+            value.append( init );
 
             charactersWritten = true;
         }
@@ -79,14 +79,14 @@ public class PxrComment implements PxrItem
         {
             switchEolOnText();
 
-            b.append( text );
+            value.append( text );
 
             charactersWritten = true;
         }
 
         if ( newEol )
         {
-            if ( b.length() == 0 )
+            if ( value.length() == 0 )
             {
                 if ( eol )
                 {
@@ -108,13 +108,13 @@ public class PxrComment implements PxrItem
     {
         if ( eol )
         {
-            if ( b.length() == 0 )
+            if ( value.length() == 0 )
             {
                 linesBefore++;
             }
             else
             {
-                b.append( "\n" );
+                value.append( "\n" );
             }
         }
         eol = false;

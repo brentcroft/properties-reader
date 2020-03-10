@@ -1,5 +1,6 @@
 package com.brentcroft.pxr.fixtures;
 
+import com.brentcroft.pxr.model.PxrProperties;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ScenarioState;
 
@@ -19,6 +20,9 @@ public class ThenProperties extends Stage< ThenProperties >
 
     @ScenarioState
     String transformResult;
+
+    @ScenarioState
+    PxrProperties pxrProperties;
 
 
     public String canonicaliseXmlText( String xmlText )
@@ -60,6 +64,12 @@ public class ThenProperties extends Stage< ThenProperties >
                 canonicalisePropertiesText( transformResult )
         );
 
+        return self();
+    }
+
+    public ThenProperties pxr_properties_is_not_null()
+    {
+        assertNotNull( pxrProperties );
         return self();
     }
 }

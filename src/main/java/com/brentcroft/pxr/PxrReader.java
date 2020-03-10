@@ -7,7 +7,6 @@ import com.brentcroft.pxr.parser.ParseException;
 import com.brentcroft.pxr.parser.PxrParser;
 import lombok.Getter;
 import lombok.Setter;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -16,6 +15,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import static com.brentcroft.pxr.PxrUtils.isNull;
+import static com.brentcroft.pxr.PxrUtils.nonNull;
 
 /**
  * Parses a Properties Text InputStream into a sequence of events.
@@ -27,6 +29,8 @@ public class PxrReader extends AbstractXMLReader
     private String systemId;
     private boolean systemIdAttribute = false;
     private boolean entriesOnly = false;
+
+    private PxrProperties pxrProperties;
 
 
     public void parse( String uri ) throws SAXException
@@ -60,32 +64,46 @@ public class PxrReader extends AbstractXMLReader
 
     public void parse( InputSource inputSource ) throws SAXException
     {
-        final ContentHandler contentHandler = getContentHandler();
-
-        if ( contentHandler == null )
-        {
-            throw new SAXException( "No ContentHandler." );
-        }
-
         try
         {
-            PxrProperties rp = new PxrParser( inputSource.getByteStream() )
-                    .parse();
-
-            rp.setSystemId( systemId );
-
-            if ( entriesOnly )
+            if ( inputSource instanceof PxrInputSource )
             {
-                rp.emitEntries( getContentHandler() );
+                pxrProperties = ( ( PxrInputSource ) inputSource ).getPxrProperties();
             }
             else
             {
-                rp.emitProperties( getContentHandler() );
+                pxrProperties = new PxrParser( inputSource.getByteStream() )
+                        .parse();
+            }
+
+            pxrProperties.setSystemId( systemId );
+
+            if ( nonNull( getContentHandler() ) )
+            {
+                parse( pxrProperties );
             }
         }
         catch ( ParseException e )
         {
             throw new SAXException( e );
+        }
+    }
+
+
+    public void parse( PxrProperties pxrProperties ) throws SAXException
+    {
+        if ( isNull( getContentHandler() ) )
+        {
+            throw new RuntimeException( "No ContentHandler" );
+        }
+
+        if ( entriesOnly )
+        {
+            pxrProperties.emitEntries( getContentHandler() );
+        }
+        else
+        {
+            pxrProperties.emitProperties( getContentHandler() );
         }
     }
 }

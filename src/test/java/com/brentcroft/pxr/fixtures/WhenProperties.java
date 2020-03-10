@@ -1,15 +1,17 @@
 package com.brentcroft.pxr.fixtures;
 
+import com.brentcroft.pxr.PxrUtils;
+import com.brentcroft.pxr.model.PxrProperties;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import com.tngtech.jgiven.annotation.ScenarioState;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 
-import static com.brentcroft.pxr.PxrUtils.propertiesTextToXmlText;
-import static com.brentcroft.pxr.PxrUtils.xmlTextToPropertiesText;
+import static com.brentcroft.pxr.PxrUtils.*;
 
 public class WhenProperties extends Stage< WhenProperties >
 {
@@ -25,8 +27,11 @@ public class WhenProperties extends Stage< WhenProperties >
     @ProvidedScenarioState
     String transformResult;
 
+    @ProvidedScenarioState
+    PxrProperties pxrProperties;
 
-    public WhenProperties transform_to_xml_text() throws TransformerException
+
+    public WhenProperties transform_text_to_xml_text() throws TransformerException
     {
         StringWriter baos = new StringWriter();
 
@@ -41,7 +46,7 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public void transform_to_properties_text() throws TransformerException
+    public WhenProperties transform_xml_to_properties_text() throws TransformerException
     {
         StringWriter baos = new StringWriter();
 
@@ -51,5 +56,25 @@ public class WhenProperties extends Stage< WhenProperties >
         );
 
         transformResult = baos.toString();
+
+        return self();
+    }
+
+    public WhenProperties transform_text_to_pxr_properties() throws SAXException
+    {
+        pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ) );
+
+        return self();
+    }
+
+    public WhenProperties transform_pxr_to_properties_text() throws TransformerException
+    {
+        StringWriter baos = new StringWriter();
+
+        PxrUtils.pxrPropertiesToText( pxrProperties, baos );
+
+        transformResult = baos.toString();
+
+        return self();
     }
 }

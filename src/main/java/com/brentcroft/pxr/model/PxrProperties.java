@@ -6,21 +6,35 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
 
+import static com.brentcroft.pxr.PxrUtils.isNull;
 import static com.brentcroft.pxr.PxrUtils.nonNull;
 
 
 @Getter
 @Setter
-public class PxrProperties implements PxrItem
+public class PxrProperties extends LinkedHashMap< String, PxrEntry > implements PxrItem
 {
     private String systemId = null;
     private PxrComment header;
-    private final List< PxrEntry > entries = new ArrayList< PxrEntry >();
     private PxrComment footer;
 
+    public PxrComment getComment( String key )
+    {
+        if ("_header".equals( key ))
+        {
+            return getHeader();
+        }
+        if ("_footer".equals( key ))
+        {
+            return getFooter();
+        }
+
+        PxrEntry entry = get( key );
+
+        return isNull( entry ) ? null : entry.getComment();
+    }
 
     public void emitProperties( ContentHandler contentHandler ) throws SAXException
     {
@@ -31,6 +45,8 @@ public class PxrProperties implements PxrItem
         {
             ATTR.SYSTEM_ID.setAttribute( atts, NAMESPACE_URI, systemId );
         }
+
+        contentHandler.startDocument();
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
 
@@ -47,12 +63,15 @@ public class PxrProperties implements PxrItem
         }
 
         contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
+
+        contentHandler.endDocument();
+
     }
 
 
     public void emitEntries( ContentHandler contentHandler ) throws SAXException
     {
-        for ( PxrEntry entry : entries )
+        for ( PxrEntry entry : values() )
         {
             entry.emitEntry( contentHandler );
         }
