@@ -6,6 +6,7 @@ import static com.brentcroft.pxr.PxrUtils.isNull;
 import com.brentcroft.pxr.model.PxrComment;
 import com.brentcroft.pxr.model.PxrEntry;
 import com.brentcroft.pxr.model.PxrEntryContinuation;
+import com.brentcroft.pxr.model.PxrItem;
 import com.brentcroft.pxr.model.PxrProperties;
 import java.util.ArrayList;
 import java.util.List;

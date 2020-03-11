@@ -22,11 +22,11 @@ public class PxrProperties extends LinkedHashMap< String, PxrEntry > implements 
 
     public PxrComment getComment( String key )
     {
-        if ("_header".equals( key ))
+        if (HEADER_KEY.equals( key ))
         {
             return getHeader();
         }
-        if ("_footer".equals( key ))
+        if (FOOTER_KEY.equals( key ))
         {
             return getFooter();
         }

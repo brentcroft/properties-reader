@@ -14,6 +14,7 @@ import static com.brentcroft.pxr.PxrUtils.isNull;
 import com.brentcroft.pxr.model.PxrComment;
 import com.brentcroft.pxr.model.PxrEntry;
 import com.brentcroft.pxr.model.PxrEntryContinuation;
+import com.brentcroft.pxr.model.PxrItem;
 import com.brentcroft.pxr.model.PxrProperties;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class PxrParser
+public class PxrParser implements PxrItem
 {
 }
 PARSER_END( PxrParser )
@@ -68,7 +69,7 @@ PxrProperties parse() :
                 {
                     if (isNull( comment ))
                     {
-                        comment = new PxrComment( 0, "_footer", false, false );
+                        comment = new PxrComment( 0, FOOTER_KEY, false, false );
                     }
                     else if ( isNull( rp.getHeader() )
                             && rp.isEmpty()
@@ -78,11 +79,11 @@ PxrProperties parse() :
                             && isNull( space )
                             && isNull( init ) )
                     {
-                        comment.setKey( "_header" );
+                        comment.setKey( HEADER_KEY );
 
                         rp.setHeader( comment );
 
-                        comment = new PxrComment( 0, "_footer", false, false );
+                        comment = new PxrComment( 0, FOOTER_KEY, false, false );
                     }
 
                     comment.ingest( space,  init, text, eol );
@@ -137,6 +138,10 @@ String text() :
         (
             t = <CHAR>
             | t = <SPACE>
+            | t = <EQUALS>
+            | t = <COLON>
+            | t = <HASH>
+            | t = <BANG>
         )
         { b.append( t.image ); }
     )+

@@ -8,6 +8,7 @@ import static com.brentcroft.pxr.PxrUtils.isNull;
 import com.brentcroft.pxr.model.PxrComment;
 import com.brentcroft.pxr.model.PxrEntry;
 import com.brentcroft.pxr.model.PxrEntryContinuation;
+import com.brentcroft.pxr.model.PxrItem;
 import com.brentcroft.pxr.model.PxrProperties;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-public class PxrParser implements PxrParserConstants {
+public class PxrParser implements PxrItem, PxrParserConstants {
 
   final public PxrProperties parse() throws ParseException {String space = null;
     String init = null;
@@ -98,7 +99,7 @@ if ( isNull( key ) )
                 {
                     if (isNull( comment ))
                     {
-                        comment = new PxrComment( 0, "_footer", false, false );
+                        comment = new PxrComment( 0, FOOTER_KEY, false, false );
                     }
                     else if ( isNull( rp.getHeader() )
                             && rp.isEmpty()
@@ -108,11 +109,11 @@ if ( isNull( key ) )
                             && isNull( space )
                             && isNull( init ) )
                     {
-                        comment.setKey( "_header" );
+                        comment.setKey( HEADER_KEY );
 
                         rp.setHeader( comment );
 
-                        comment = new PxrComment( 0, "_footer", false, false );
+                        comment = new PxrComment( 0, FOOTER_KEY, false, false );
                     }
 
                     comment.ingest( space,  init, text, eol );
@@ -196,6 +197,22 @@ rp.setFooter( comment );
         }
       case SPACE:{
         t = jj_consume_token(SPACE);
+        break;
+        }
+      case EQUALS:{
+        t = jj_consume_token(EQUALS);
+        break;
+        }
+      case COLON:{
+        t = jj_consume_token(COLON);
+        break;
+        }
+      case HASH:{
+        t = jj_consume_token(HASH);
+        break;
+        }
+      case BANG:{
+        t = jj_consume_token(BANG);
         break;
         }
       default:
@@ -433,45 +450,6 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     finally { jj_save(11, xla); }
   }
 
-  private boolean jj_3R_4()
- {
-    Token xsp;
-    if (jj_3_6()) return true;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_6()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3_5()
- {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_5()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (!jj_scan_token(1)) return false;
-    jj_scanpos = xsp;
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3_7()
- {
-    if (jj_3R_4()) return true;
-    return false;
-  }
-
-  private boolean jj_3_2()
- {
-    if (jj_3R_5()) return true;
-    return false;
-  }
-
   private boolean jj_3_8()
  {
     if (jj_3R_5()) return true;
@@ -485,6 +463,12 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     return false;
   }
 
+  private boolean jj_3_2()
+ {
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
   private boolean jj_3R_9()
  {
     if (jj_3R_8()) return true;
@@ -494,15 +478,6 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
   private boolean jj_3R_8()
  {
     if (jj_scan_token(SPACE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_3()
- {
-    if (jj_3R_4()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_6()) jj_scanpos = xsp;
     return false;
   }
 
@@ -521,6 +496,15 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
   private boolean jj_3_9()
  {
     if (jj_3R_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3_3()
+ {
+    if (jj_3R_4()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_6()) jj_scanpos = xsp;
     return false;
   }
 
@@ -563,12 +547,6 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     return false;
   }
 
-  private boolean jj_3R_6()
- {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
   private boolean jj_3R_7()
  {
     Token xsp;
@@ -581,9 +559,9 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     return false;
   }
 
-  private boolean jj_3_1()
+  private boolean jj_3R_6()
  {
-    if (jj_3R_4()) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -594,13 +572,27 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     return false;
   }
 
+  private boolean jj_3_1()
+ {
+    if (jj_3R_4()) return true;
+    return false;
+  }
+
   private boolean jj_3_6()
  {
     Token xsp;
     xsp = jj_scanpos;
     if (!jj_scan_token(9)) return false;
     jj_scanpos = xsp;
-    if (jj_scan_token(3)) return true;
+    if (!jj_scan_token(3)) return false;
+    jj_scanpos = xsp;
+    if (!jj_scan_token(6)) return false;
+    jj_scanpos = xsp;
+    if (!jj_scan_token(7)) return false;
+    jj_scanpos = xsp;
+    if (!jj_scan_token(5)) return false;
+    jj_scanpos = xsp;
+    if (jj_scan_token(4)) return true;
     return false;
   }
 
@@ -610,6 +602,39 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_3()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_5()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (!jj_scan_token(1)) return false;
+    jj_scanpos = xsp;
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_4()
+ {
+    Token xsp;
+    if (jj_3_6()) return true;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_6()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_7()
+ {
+    if (jj_3R_4()) return true;
+    return false;
+  }
+
+  private boolean jj_3_5()
+ {
+    if (jj_3R_5()) return true;
     return false;
   }
 
@@ -630,7 +655,7 @@ cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) );
 	   jj_la1_init_0();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x100,0x23e,0x23e,0x23f,0x30,0x208,0x100,0x8,0x8,0x8,0x6,};
+	   jj_la1_0 = new int[] {0x100,0x23e,0x23e,0x23f,0x30,0x2f8,0x100,0x8,0x8,0x8,0x6,};
 	}
   final private JJCalls[] jj_2_rtns = new JJCalls[12];
   private boolean jj_rescan = false;

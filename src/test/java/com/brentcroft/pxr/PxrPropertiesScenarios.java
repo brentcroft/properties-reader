@@ -5,6 +5,10 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.TransformerException;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import static com.brentcroft.pxr.fixtures.GivenProperties.readFile;
 
 public class PxrPropertiesScenarios extends AbstractScenarios
 {

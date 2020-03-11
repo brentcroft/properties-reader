@@ -10,7 +10,7 @@
             <xsl:apply-templates select="."/>
         </xsl:for-each>
         <xsl:for-each select="//entry[ not( @key='_header' or @key='_footer' ) ]">
-            <xsl:sort select="@index"/>
+            <xsl:sort select="@index" data-type="number"/>
             <xsl:variable name="key" select="@key"/>
             <xsl:for-each select="preceding-sibling::comment[ @key = $key ]">
                 <xsl:apply-templates select="."/>
@@ -23,10 +23,12 @@
     </xsl:template>
 
     <xsl:template match="comment">
+        <xsl:variable name="text" select="."/>
         <xsl:call-template name="lines-before">
             <xsl:with-param name="lines" select="number( @lines-before )"/>
         </xsl:call-template>
-        <xsl:value-of select="."/>
+        <xsl:if test="string-length( normalize-space( $text ) ) &gt; 1 and not( starts-with( $text, '#' ) )"><xsl:text>#</xsl:text></xsl:if>
+        <xsl:value-of select="$text"/>
         <xsl:if test="not( @eol = 0 )">
             <xsl:text>&#10;</xsl:text>
         </xsl:if>
