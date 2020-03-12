@@ -79,7 +79,7 @@ public interface PxrItem
 
         public boolean hasAttribute( Attributes atts )
         {
-            return atts.getIndex( attr ) > -1;
+            return atts.getIndex( attr ) > - 1;
         }
 
         public String getAttribute( Attributes atts )

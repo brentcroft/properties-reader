@@ -40,7 +40,7 @@ public class PxrEntryContinuation implements PxrItem
 
         if ( ! eol )
         {
-            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, String.valueOf( eol ) );
+            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "false" );
         }
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );

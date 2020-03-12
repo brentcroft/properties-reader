@@ -42,7 +42,7 @@ public class PxrEntry implements PxrItem
 
         ATTR.INDEX.setAttribute( atts, NAMESPACE_URI, String.valueOf( index ) );
 
-        if ( isNull( sep ))
+        if ( isNull( sep ) )
         {
             sep = "";
         }
