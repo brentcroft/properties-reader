@@ -2,14 +2,11 @@ package com.brentcroft.pxr.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.LinkedHashMap;
+import java.util.Properties;
 
 import static com.brentcroft.pxr.PxrUtils.isNull;
-import static com.brentcroft.pxr.PxrUtils.nonNull;
 
 
 @Getter
@@ -36,44 +33,15 @@ public class PxrProperties extends LinkedHashMap< String, PxrEntry > implements 
         return isNull( entry ) ? null : entry.getComment();
     }
 
-    public void emitProperties( ContentHandler contentHandler ) throws SAXException
+
+    public Properties getProperties()
     {
-        TAG tag = TAG.PROPERTIES;
-        AttributesImpl atts = new AttributesImpl();
+        Properties p = new Properties();
 
-        if ( nonNull( systemId ) )
-        {
-            ATTR.SYSTEM_ID.setAttribute( atts, NAMESPACE_URI, systemId );
-        }
-
-        contentHandler.startDocument();
-
-        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
-
-        if ( nonNull( header ) )
-        {
-            header.emitEntry( contentHandler );
-        }
-
-        emitEntries( contentHandler );
-
-        if ( nonNull( footer ) )
-        {
-            footer.emitEntry( contentHandler );
-        }
-
-        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
-
-        contentHandler.endDocument();
-
-    }
-
-
-    public void emitEntries( ContentHandler contentHandler ) throws SAXException
-    {
         for ( PxrEntry entry : values() )
         {
-            entry.emitEntry( contentHandler );
+            p.put( entry.getKey(), entry.getValue() );
         }
+        return p;
     }
 }

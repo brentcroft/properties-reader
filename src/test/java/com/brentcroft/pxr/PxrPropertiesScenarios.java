@@ -1,6 +1,7 @@
 package com.brentcroft.pxr;
 
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
+import com.brentcroft.pxr.parser.ParseException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -14,7 +15,7 @@ public class PxrPropertiesScenarios extends AbstractScenarios
 {
 
     @Test
-    public void pxr_properties() throws TransformerException, SAXException
+    public void pxr_properties() throws TransformerException, ParseException
     {
         given()
                 .properties_text( "color = red\n" );

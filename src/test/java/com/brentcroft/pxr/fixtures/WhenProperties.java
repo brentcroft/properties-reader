@@ -2,6 +2,7 @@ package com.brentcroft.pxr.fixtures;
 
 import com.brentcroft.pxr.PxrUtils;
 import com.brentcroft.pxr.model.PxrProperties;
+import com.brentcroft.pxr.parser.ParseException;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
 import com.tngtech.jgiven.annotation.ScenarioState;
@@ -60,7 +61,7 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties transform_text_to_pxr_properties() throws SAXException
+    public WhenProperties transform_text_to_pxr_properties() throws ParseException
     {
         pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ) );
 
