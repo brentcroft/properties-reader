@@ -22,7 +22,7 @@ import static java.lang.String.format;
 
 /**
  * Handles a stream of SAX (Update) Events by creating or updating a PxrProperties Object.
- *
+ * <p>
  * Elements are assumed to be additions, or confirmations, but if the "act" prefix is detected the following applies:
  *
  * <ul>
@@ -89,7 +89,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     {
         for ( PxrComment comment : forwardComments )
         {
-            PxrEntry entry = pxrProperties.get( comment.getKey() );
+            PxrEntry entry = pxrProperties.getEntryMap().get( comment.getKey() );
 
             if ( isNull( entry ) )
             {
@@ -181,7 +181,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                     format( "Element <%s> has empty or missing attribute @key", tag ) );
         }
 
-        PxrEntry entry = pxrProperties.get( key );
+        PxrEntry entry = pxrProperties.getEntryMap().get( key );
 
         final String actual = TAG.ENTRY.isTag( tag ) && nonNull( entry )
                               ? entry.getValue()
@@ -201,7 +201,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         final ACT[] action = {
                 TAG.DELETE_ENTRY.isTag( tag ) || TAG.DELETE_COMMENT.isTag( tag )
                 ? ACT.DELETE
-                : pxrProperties.containsKey( key )
+                : pxrProperties.getEntryMap().containsKey( key )
                   ? ACT.UPDATE
                   : ACT.INSERT
         };
@@ -232,13 +232,13 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                     // not the exp:namespace
                     if ( TAG.ENTRY.isTag( tag ) )
                     {
-                        PxrEntry entryForUpdate = pxrProperties.get( key );
+                        PxrEntry entryForUpdate = pxrProperties.getEntryMap().get( key );
 
                         if ( isNull( entryForUpdate ) )
                         {
-                            pxrProperties.put( key, new PxrEntry(
+                            pxrProperties.append( new PxrEntry(
                                     null,
-                                    pxrProperties.size(),
+                                    pxrProperties.getEntries().size(),
                                     key,
                                     "=",
                                     newValue,
@@ -253,7 +253,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                     }
                     else if ( TAG.COMMENT.isTag( tag ) )
                     {
-                        PxrEntry entryForUpdate = pxrProperties.get( key );
+                        PxrEntry entryForUpdate = pxrProperties.getEntryMap().get( key );
 
                         if ( isNull( entryForUpdate ) )
                         {
@@ -315,7 +315,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
             PxrEntry entry = new PxrEntry(
                     comment,
-                    properties.size(),
+                    properties.getEntries().size(),
                     key,
                     "=",
                     newValue,
@@ -323,7 +323,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                     null
             );
 
-            properties.put( entry.getKey(), entry );
+            properties.append( entry );
         }
         else if ( TAG.COMMENT.isTag( tag ) )
         {
@@ -389,7 +389,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
             }
             else
             {
-                PxrEntry entry = properties.get( key );
+                PxrEntry entry = properties.getEntryMap().get( key );
 
                 if ( nonNull( entry ) )
                 {

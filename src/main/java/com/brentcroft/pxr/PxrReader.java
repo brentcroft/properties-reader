@@ -78,7 +78,7 @@ public class PxrReader extends AbstractXMLReader
 
     private static void emitEntries( PxrProperties pxrProperties, ContentHandler contentHandler ) throws SAXException
     {
-        for ( PxrEntry entry : pxrProperties.values() )
+        for ( PxrEntry entry : pxrProperties.getEntries() )
         {
             entry.emitEntry( contentHandler );
         }

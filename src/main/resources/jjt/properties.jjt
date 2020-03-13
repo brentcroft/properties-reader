@@ -32,12 +32,12 @@ TOKEN :
     <LF: "\n">
     | <CR: "\r">
     | <SPACE:  ( " " )+ >
-    | <BANG:  "!" ( <SPACE> )* >
-    | <HASH:  "#" ( <SPACE> )* >
+    | <BANG:  "!" ( <SPACE> )? >
+    | <HASH:  "#" ( <SPACE> )? >
     | <EQUALS:  "=" >
     | <COLON:  ":" >
     // non-standard generous continuation
-    // allows anything (including adjacent backslashes) linebreak
+    // allows anything (including adjacent backslashes) up to linebreak
     | <CONT:  "\\" ( ~[ "\n", "\r", "\\" ] )* >
     | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " " ] )+ >
 }
@@ -95,7 +95,7 @@ PxrProperties parse() :
                         comment.setKey( key );
                     }
 
-                    rp.put( key, new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
+                    rp.append( new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
 
                     comment = null;
                 }

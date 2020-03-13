@@ -125,7 +125,7 @@ if ( isNull( key ) )
                         comment.setKey( key );
                     }
 
-                    rp.put( key, new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
+                    rp.append(  new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
 
                     comment = null;
                 }
