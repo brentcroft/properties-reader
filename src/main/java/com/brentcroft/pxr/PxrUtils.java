@@ -61,7 +61,7 @@ public class PxrUtils
     }
 
 
-    public static void propertiesTextToXmlText( InputStream inputStream, Writer writer, boolean omitXmlDeclaration ) throws TransformerException
+    public static void propertiesTextToXmlText( InputStream inputStream, Writer writer, String encoding ) throws TransformerException
     {
         Transformer transformer = SAXTransformerFactory
                 .newInstance()
@@ -69,12 +69,7 @@ public class PxrUtils
 
         transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
         transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-
-        if ( omitXmlDeclaration )
-        {
-            transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
-        }
-
+        transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
         transformer.setOutputProperty( OutputKeys.CDATA_SECTION_ELEMENTS, PxrItem.TAGS_FOR_CATA_TEXT );
         transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
 
@@ -82,18 +77,24 @@ public class PxrUtils
 
         transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", Integer.toString( indent ) );
 
+        PxrReader pxrReader = new PxrReader();
+
+        pxrReader.setEncoding( encoding );
+
         transformer.transform(
                 new SAXSource(
-                        new PxrReader(),
+                        pxrReader,
                         new InputSource( inputStream )
                 ),
                 new StreamResult( writer )
         );
     }
 
-    public static PxrProperties getPxrProperties( InputStream inputStream ) throws SAXException
+    public static PxrProperties getPxrProperties( InputStream inputStream, String encoding ) throws SAXException
     {
         PxrReader reader = new PxrReader();
+
+        reader.setEncoding( encoding );
 
         reader.parse( new InputSource( inputStream ) );
 

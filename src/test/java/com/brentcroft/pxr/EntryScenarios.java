@@ -113,4 +113,21 @@ public class EntryScenarios extends AbstractScenarios
                         "</properties>"
         );
     }
+
+    @Test
+    public void weird_text() throws TransformerException
+    {
+        runRoundTrip(
+
+                "# the “allow” to",
+
+                "<properties>" +
+                        "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
+                        "</properties>",
+
+                "UTF-8"
+        );
+    }
+
+
 }

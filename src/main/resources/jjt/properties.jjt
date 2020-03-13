@@ -2,6 +2,7 @@
 options {
     OUTPUT_DIRECTORY = "src/main/java/com/brentcroft/pxr/parser";
     ERROR_REPORTING = true;
+    UNICODE_INPUT=true;
     STATIC = false;
 }
 

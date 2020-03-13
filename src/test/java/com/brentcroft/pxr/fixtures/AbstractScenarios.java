@@ -8,10 +8,15 @@ public class AbstractScenarios extends ScenarioTest< GivenProperties, WhenProper
 {
     protected void runRoundTrip( String propertiesText, String propertiesXml ) throws TransformerException
     {
+        runRoundTrip( propertiesText, propertiesXml, null );
+    }
+
+    protected void runRoundTrip( String propertiesText, String propertiesXml, String encoding ) throws TransformerException
+    {
         given()
                 .properties_text( propertiesText );
         when()
-                .transform_text_to_xml_text();
+                .transform_text_to_xml_text( encoding );
         then()
                 .xml_text_equals( propertiesXml );
         when()

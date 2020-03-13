@@ -5,6 +5,7 @@ import com.brentcroft.pxr.model.AbstractXMLReader;
 import com.brentcroft.pxr.model.PxrProperties;
 import com.brentcroft.pxr.parser.ParseException;
 import com.brentcroft.pxr.parser.PxrParser;
+import com.brentcroft.pxr.parser.TokenMgrError;
 import lombok.Getter;
 import lombok.Setter;
 import org.xml.sax.InputSource;
@@ -29,6 +30,8 @@ public class PxrReader extends AbstractXMLReader
     private String systemId;
     private boolean systemIdAttribute = false;
     private boolean entriesOnly = false;
+
+    private String encoding;
 
     private PxrProperties pxrProperties;
 
@@ -68,7 +71,12 @@ public class PxrReader extends AbstractXMLReader
         {
             if ( inputSource instanceof PxrInputSource )
             {
-                pxrProperties = ( ( PxrInputSource ) inputSource ).getPxrProperties();
+                pxrProperties = ( (PxrInputSource) inputSource ).getPxrProperties();
+            }
+            else if (nonNull(encoding))
+            {
+                pxrProperties = new PxrParser( inputSource.getByteStream(), encoding )
+                        .parse();
             }
             else
             {
@@ -86,6 +94,10 @@ public class PxrReader extends AbstractXMLReader
         catch ( ParseException e )
         {
             throw new SAXException( e );
+        }
+        catch ( TokenMgrError e )
+        {
+            throw new RuntimeException( e );
         }
     }
 

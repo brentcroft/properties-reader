@@ -20,7 +20,7 @@ public class PxrPropertiesScenarios extends AbstractScenarios
                 .properties_text( "color = red\n" );
 
         when()
-                .transform_text_to_pxr_properties();
+                .transform_text_to_pxr_properties( null);
 
         then()
                 .pxr_properties_is_not_null();

@@ -31,14 +31,14 @@ public class WhenProperties extends Stage< WhenProperties >
     PxrProperties pxrProperties;
 
 
-    public WhenProperties transform_text_to_xml_text() throws TransformerException
+    public WhenProperties transform_text_to_xml_text(String encoding) throws TransformerException
     {
         StringWriter baos = new StringWriter();
 
         propertiesTextToXmlText(
                 new ByteArrayInputStream( propertiesText.getBytes() ),
                 baos,
-                true
+                encoding
         );
 
         propertiesXml = baos.toString();
@@ -60,9 +60,9 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties transform_text_to_pxr_properties() throws SAXException
+    public WhenProperties transform_text_to_pxr_properties(String encoding) throws SAXException
     {
-        pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ) );
+        pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ), encoding );
 
         return self();
     }
