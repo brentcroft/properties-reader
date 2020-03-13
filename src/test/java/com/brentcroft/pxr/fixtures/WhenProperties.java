@@ -14,7 +14,7 @@ import java.io.StringWriter;
 
 import static com.brentcroft.pxr.PxrUtils.*;
 
-public class WhenProperties extends Stage< WhenProperties >
+public class WhenProperties extends Stage<WhenProperties>
 {
     @ScenarioState
     String propertiesText;
@@ -32,7 +32,7 @@ public class WhenProperties extends Stage< WhenProperties >
     PxrProperties pxrProperties;
 
 
-    public WhenProperties transform_text_to_xml_text(String encoding) throws TransformerException
+    public WhenProperties transform_text_to_xml_text( String encoding ) throws TransformerException
     {
         StringWriter baos = new StringWriter();
 
@@ -61,10 +61,9 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties transform_text_to_pxr_properties(String encoding) throws SAXException
     public WhenProperties transform_text_to_pxr_properties() throws ParseException
     {
-        pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ), encoding );
+        pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ) );
 
         return self();
     }

@@ -5,7 +5,6 @@ import com.brentcroft.pxr.model.PxrProperties;
 import com.brentcroft.pxr.parser.ParseException;
 import com.brentcroft.pxr.parser.PxrParser;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXSource;
@@ -30,7 +29,7 @@ public class PxrUtils
 
     public static boolean nonNull( Object o )
     {
-        return ! isNull( o );
+        return !isNull( o );
     }
 
 
@@ -92,13 +91,6 @@ public class PxrUtils
         );
     }
 
-    public static PxrProperties getPxrProperties( InputStream inputStream, String encoding ) throws SAXException
-    {
-        PxrReader reader = new PxrReader();
-
-        reader.setEncoding( encoding );
-
-        reader.parse( new InputSource( inputStream ) );
 
     public static PxrProperties getPxrProperties( InputStream inputStream ) throws ParseException
     {
