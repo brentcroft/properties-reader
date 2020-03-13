@@ -22,6 +22,11 @@ public class PxrComment implements PxrItem
 
     private final StringBuilder value = new StringBuilder();
 
+    public String getText()
+    {
+        return value.toString();
+    }
+
     public void emitEntry( ContentHandler contentHandler ) throws SAXException
     {
         final TAG tag = TAG.COMMENT;

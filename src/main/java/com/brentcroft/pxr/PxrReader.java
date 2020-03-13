@@ -2,32 +2,30 @@ package com.brentcroft.pxr;
 
 
 import com.brentcroft.pxr.model.AbstractXMLReader;
+import com.brentcroft.pxr.model.PxrEntry;
+import com.brentcroft.pxr.model.PxrItem;
 import com.brentcroft.pxr.model.PxrProperties;
 import com.brentcroft.pxr.parser.ParseException;
 import com.brentcroft.pxr.parser.PxrParser;
 import com.brentcroft.pxr.parser.TokenMgrError;
 import lombok.Getter;
 import lombok.Setter;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.xml.sax.helpers.AttributesImpl;
 
 import static com.brentcroft.pxr.PxrUtils.isNull;
 import static com.brentcroft.pxr.PxrUtils.nonNull;
+import static com.brentcroft.pxr.model.PxrItem.NAMESPACE_URI;
 
 /**
- * Parses a Properties Text InputStream into a sequence of events.
+ * Parses a Properties Text InputStream into a sequence of SAX Events.
  */
 @Getter
 @Setter
 public class PxrReader extends AbstractXMLReader
 {
-    private String systemId;
     private boolean systemIdAttribute = false;
     private boolean entriesOnly = false;
 
@@ -35,35 +33,6 @@ public class PxrReader extends AbstractXMLReader
 
     private PxrProperties pxrProperties;
 
-
-    public void parse( String uri ) throws SAXException
-    {
-        systemId = uri;
-
-        try
-        {
-            parse( new InputSource( new URL( uri ).openStream() ) );
-
-            return;
-        }
-        catch ( MalformedURLException e )
-        {
-            // ok - try file
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( e );
-        }
-
-        try
-        {
-            parse( new InputSource( new FileInputStream( uri ) ) );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new SAXException( e );
-        }
-    }
 
     public void parse( InputSource inputSource ) throws SAXException
     {
@@ -84,7 +53,7 @@ public class PxrReader extends AbstractXMLReader
                         .parse();
             }
 
-            pxrProperties.setSystemId( systemId );
+            pxrProperties.setSystemId( getSystemId() );
 
             if ( nonNull( getContentHandler() ) )
             {
@@ -111,11 +80,50 @@ public class PxrReader extends AbstractXMLReader
 
         if ( entriesOnly )
         {
-            pxrProperties.emitEntries( getContentHandler() );
+            emitEntries( pxrProperties, getContentHandler() );
         }
         else
         {
-            pxrProperties.emitProperties( getContentHandler() );
+            emitProperties( pxrProperties, getContentHandler() );
         }
+    }
+
+    private static void emitEntries( PxrProperties pxrProperties, ContentHandler contentHandler ) throws SAXException
+    {
+        for ( PxrEntry entry : pxrProperties.getEntries() )
+        {
+            entry.emitEntry( contentHandler );
+        }
+    }
+
+    private static void emitProperties( PxrProperties pxrProperties, ContentHandler contentHandler ) throws SAXException
+    {
+        PxrItem.TAG tag = PxrItem.TAG.PROPERTIES;
+        AttributesImpl atts = new AttributesImpl();
+
+        if ( nonNull( pxrProperties.getSystemId() ) )
+        {
+            PxrItem.ATTR.SYSTEM_ID.setAttribute( atts, NAMESPACE_URI, pxrProperties.getSystemId() );
+        }
+
+        contentHandler.startDocument();
+
+        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
+
+        if ( nonNull( pxrProperties.getHeader() ) )
+        {
+            pxrProperties.getHeader().emitEntry( contentHandler );
+        }
+
+        emitEntries( pxrProperties, contentHandler );
+
+        if ( nonNull( pxrProperties.getFooter() ) )
+        {
+            pxrProperties.getFooter().emitEntry( contentHandler );
+        }
+
+        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
+
+        contentHandler.endDocument();
     }
 }

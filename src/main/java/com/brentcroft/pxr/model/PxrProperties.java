@@ -2,11 +2,8 @@ package com.brentcroft.pxr.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import static com.brentcroft.pxr.PxrUtils.isNull;
 import static com.brentcroft.pxr.PxrUtils.nonNull;
@@ -14,11 +11,47 @@ import static com.brentcroft.pxr.PxrUtils.nonNull;
 
 @Getter
 @Setter
-public class PxrProperties extends LinkedHashMap< String, PxrEntry > implements PxrItem
+public class PxrProperties implements PxrItem
 {
     private String systemId = null;
     private PxrComment header;
     private PxrComment footer;
+
+    private final List< PxrEntry > entries = new ArrayList< PxrEntry >();
+    private final Map< String, PxrEntry > entryMap = new HashMap< String, PxrEntry >();
+
+    public boolean isEmpty()
+    {
+        return entries.isEmpty();
+    }
+
+    public void append( PxrEntry entry )
+    {
+        // maybe force line break ahead of new entry
+        if ( entries.size() > 0 )
+        {
+            PxrEntry lastEntry = entries.get( entries.size() - 1 );
+            if ( ! lastEntry.isEol() )
+            {
+                lastEntry.setEol( true );
+            }
+        }
+
+        entries.add( entry );
+        entryMap.put( entry.getKey(), entry );
+    }
+
+    public void remove( String key )
+    {
+        PxrEntry entry = entryMap.get( key );
+
+        if ( nonNull( entry ) )
+        {
+            entryMap.remove( key );
+            entries.remove( entry );
+        }
+    }
+
 
     public PxrComment getComment( String key )
     {
@@ -26,54 +59,28 @@ public class PxrProperties extends LinkedHashMap< String, PxrEntry > implements 
         {
             return getHeader();
         }
-        if ( FOOTER_KEY.equals( key ) )
+        else if ( FOOTER_KEY.equals( key ) )
         {
             return getFooter();
         }
 
-        PxrEntry entry = get( key );
+        PxrEntry entry = entryMap.get( key );
 
-        return isNull( entry ) ? null : entry.getComment();
-    }
-
-    public void emitProperties( ContentHandler contentHandler ) throws SAXException
-    {
-        TAG tag = TAG.PROPERTIES;
-        AttributesImpl atts = new AttributesImpl();
-
-        if ( nonNull( systemId ) )
-        {
-            ATTR.SYSTEM_ID.setAttribute( atts, NAMESPACE_URI, systemId );
-        }
-
-        contentHandler.startDocument();
-
-        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
-
-        if ( nonNull( header ) )
-        {
-            header.emitEntry( contentHandler );
-        }
-
-        emitEntries( contentHandler );
-
-        if ( nonNull( footer ) )
-        {
-            footer.emitEntry( contentHandler );
-        }
-
-        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
-
-        contentHandler.endDocument();
-
+        return isNull( entry )
+               ? null
+               : entry.getComment();
     }
 
 
-    public void emitEntries( ContentHandler contentHandler ) throws SAXException
+    public Properties getProperties()
     {
-        for ( PxrEntry entry : values() )
+        Properties p = new Properties();
+
+        for ( PxrEntry entry : entries )
         {
-            entry.emitEntry( contentHandler );
+            p.put( entry.getKey(), entry.getValue() );
         }
+
+        return p;
     }
 }

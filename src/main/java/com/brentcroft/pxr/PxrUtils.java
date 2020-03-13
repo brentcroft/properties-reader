@@ -2,6 +2,8 @@ package com.brentcroft.pxr;
 
 import com.brentcroft.pxr.model.PxrItem;
 import com.brentcroft.pxr.model.PxrProperties;
+import com.brentcroft.pxr.parser.ParseException;
+import com.brentcroft.pxr.parser.PxrParser;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -98,8 +100,11 @@ public class PxrUtils
 
         reader.parse( new InputSource( inputStream ) );
 
-        return reader.getPxrProperties();
+    public static PxrProperties getPxrProperties( InputStream inputStream ) throws ParseException
+    {
+        return new PxrParser( inputStream ).parse();
     }
+
 
     public static void pxrPropertiesToText( PxrProperties pxrProperties, Writer writer ) throws TransformerException
     {

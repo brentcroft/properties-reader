@@ -1,5 +1,5 @@
-# properties-xml-reader
-JavaCC grammar and kit to generate SAX events describing a java properties file, and XSL transform to regenerate original file.
+# properties-reader
+JavaCC grammar and kit to generate SAX events describing a java properties file, and an XSL transform to regenerate the original file.
 
 
 JavaCC File used to produce the parser:

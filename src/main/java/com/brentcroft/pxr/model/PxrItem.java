@@ -1,5 +1,8 @@
 package com.brentcroft.pxr.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -9,6 +12,7 @@ public interface PxrItem
 {
     String NAMESPACE_URI = "";
     String EXPECTED_NAMESPACE_PREFIX = "act";
+    String EXPECTED_NAMESPACE_URI = "expected";
 
     String TAGS_FOR_CATA_TEXT = TAG.COMMENT.getTag();
 
@@ -23,6 +27,25 @@ public interface PxrItem
         DELETE,
         CONFIRM
     }
+
+
+    @Getter
+    @AllArgsConstructor
+    class ACTException extends RuntimeException
+    {
+        private final ACT action;
+        private final String key;
+        private final String expected;
+        private final String actual;
+
+        private static final String MSG_ACTION_FAILED = "DENIED [%s] : expected != actual : key=[%s], expected=[%s], actual=[%s]";
+
+        public String getMessage()
+        {
+            return format( MSG_ACTION_FAILED, action, key, expected, actual );
+        }
+    }
+
 
 
     enum TAG
@@ -66,6 +89,7 @@ public interface PxrItem
         SEP( "sep" ),
         INDEX( "index" ),
         SRC( "src" ),
+        TRUNCATED("truncated"),
         EXPECTED( format( "%s:_text", EXPECTED_NAMESPACE_PREFIX ) ),
         ;
 
@@ -75,6 +99,11 @@ public interface PxrItem
         ATTR( String attr )
         {
             this.attr = attr;
+        }
+
+        public boolean isAttribute( String name )
+        {
+            return attr.equals( name );
         }
 
         public boolean hasAttribute( Attributes atts )
@@ -95,6 +124,21 @@ public interface PxrItem
         public void setAttribute( AttributesImpl atts, String namespaceUri, String value )
         {
             atts.addAttribute( namespaceUri, attr, attr, "", value == null ? "" : value );
+        }
+
+        public boolean hasAttribute( Element element )
+        {
+            return element.hasAttribute( attr );
+        }
+
+        public String getAttribute( Element element )
+        {
+            return hasAttribute( element ) ? element.getAttribute( attr ) : null;
+        }
+
+        public void setAttribute( Element element, String value )
+        {
+            element.setAttribute( getAttribute(), value );
         }
     }
 }
