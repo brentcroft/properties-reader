@@ -2,10 +2,12 @@ package com.brentcroft.pxr.fixtures;
 
 import com.brentcroft.pxr.model.PxrProperties;
 import com.tngtech.jgiven.Stage;
+import com.tngtech.jgiven.annotation.As;
 import com.tngtech.jgiven.annotation.ScenarioState;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static com.brentcroft.pxr.fixtures.Utils.canonicalisePropertiesText;
+import static com.brentcroft.pxr.fixtures.Utils.canonicaliseXmlText;
+import static org.junit.Assert.*;
 
 public class ThenProperties extends Stage< ThenProperties >
 {
@@ -25,21 +27,6 @@ public class ThenProperties extends Stage< ThenProperties >
     PxrProperties pxrProperties;
 
 
-    public String canonicaliseXmlText( String xmlText )
-    {
-        return xmlText
-                .trim()
-                .replaceAll( "\r", "" )
-                .replaceAll( ">\\s*<", "><" )
-                .replaceAll( "'", "\"" );
-    }
-
-    public String canonicalisePropertiesText( String propertiesText )
-    {
-        return propertiesText
-                .replaceAll( "\r", "" );
-    }
-
     public ThenProperties xml_text_is_not_null()
     {
         assertNotNull( propertiesXml );
@@ -57,6 +44,15 @@ public class ThenProperties extends Stage< ThenProperties >
         return self();
     }
 
+    public ThenProperties xml_text_not_equals( String xml_text )
+    {
+        assertNotEquals(
+                canonicaliseXmlText( xml_text ),
+                canonicaliseXmlText( propertiesXml )
+        );
+
+        return self();
+    }
     public ThenProperties same_properties_text()
     {
         assertEquals(
@@ -67,9 +63,37 @@ public class ThenProperties extends Stage< ThenProperties >
         return self();
     }
 
+    public ThenProperties different_properties_text()
+    {
+        assertNotEquals(
+                canonicalisePropertiesText( propertiesText ),
+                canonicalisePropertiesText( transformResult )
+        );
+
+        return self();
+    }
+
+
+    @As( "transform result: \n[$]\n" )
+    public ThenProperties transform_result_is( String expected )
+    {
+        assertEquals(
+                canonicalisePropertiesText( expected ),
+                canonicalisePropertiesText( transformResult )
+        );
+
+        return self();
+    }
+
+
     public ThenProperties pxr_properties_is_not_null()
     {
         assertNotNull( pxrProperties );
+        return self();
+    }
+
+    public ThenProperties transformer_exception()
+    {
         return self();
     }
 }

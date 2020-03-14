@@ -1,9 +1,6 @@
 package com.brentcroft.pxr;
 
-import com.brentcroft.pxr.model.PxrComment;
-import com.brentcroft.pxr.model.PxrEntry;
-import com.brentcroft.pxr.model.PxrItem;
-import com.brentcroft.pxr.model.PxrProperties;
+import com.brentcroft.pxr.model.*;
 import com.brentcroft.pxr.parser.ParseException;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +40,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     @Getter
     private ContextValueMapper contextValueMapper;
 
+    @Setter
     @Getter
     private PxrProperties pxrProperties;
 
@@ -50,16 +48,26 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     @Getter
     private InputStream inputStream;
 
+    @Setter
+    @Getter
+    private String encoding = "UTF-8";
+
 
     // comments typically occur before their parent entry
     // and so can't be bound until all entries are read
     private List< PxrComment > forwardComments = new ArrayList< PxrComment >();
-    private StringBuilder stringBuilder = new StringBuilder();
+    private List< PxrEntryContinuation > pxrEntryContinuations = new ArrayList< PxrEntryContinuation >();
+    private StringBuilder entryText = new StringBuilder();
+    private StringBuilder continuationText = new StringBuilder();
     private String tag;
-    private String key;
+    private String sep;
+    private String cont;
+    private String prefix;
+    private String entryKey;
     private String expected;
     private int linesBefore;
     private boolean eol = false;
+    private PxrEntry entryForUpdate;
 
 
     @Override
@@ -69,14 +77,14 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         {
             try
             {
-                pxrProperties = PxrUtils.getPxrProperties( getInputStream() );
+                pxrProperties = PxrUtils.getPxrProperties( getInputStream(), encoding );
             }
             catch ( ParseException e )
             {
                 throw new SAXException( e );
             }
         }
-        else
+        else if ( isNull( pxrProperties ) )
         {
             pxrProperties = new PxrProperties();
         }
@@ -116,13 +124,15 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     @Override
     public void startElement( String uri, String localName, String qName, Attributes attributes )
     {
-        if ( ( TAG.ENTRY.isTag( qName )
-                || TAG.COMMENT.isTag( qName )
-                || TAG.DELETE_ENTRY.isTag( qName )
-                || TAG.DELETE_COMMENT.isTag( qName ) ) )
+        if ( isUpdatableTag( qName ) )
         {
             tag = qName;
-            key = ATTR.KEY.getAttribute( attributes );
+
+            if (!TAG.TEXT.isTag( qName ))
+            {
+                entryKey = ATTR.KEY.getAttribute( attributes );
+            }
+
             expected = ATTR.EXPECTED.getAttribute( attributes );
 
             String linesBeforeText = ATTR.LINES_BEFORE.getAttribute( attributes );
@@ -131,11 +141,25 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                           ? 0
                           : Integer.parseInt( linesBeforeText );
 
-            String eolText = PxrItem.ATTR.EOL.getAttribute( attributes );
+            String eolText = ATTR.EOL.getAttribute( attributes );
 
+            // eol is true unless explicitly set to false
             eol = ( isNull( eolText ) || eolText.trim().length() == 0 ) || Boolean.parseBoolean( eolText );
 
-            stringBuilder.setLength( 0 );
+            sep = ATTR.SEP.hasAttribute( attributes ) ? ATTR.SEP.getAttribute( attributes ) : "=";
+
+            cont = ATTR.CONT.getAttribute( attributes );
+            prefix = ATTR.PREFIX.getAttribute( attributes );
+
+            if ( TAG.ENTRY.isTag( qName ) || TAG.COMMENT.isTag( qName ) )
+            {
+                entryText.setLength( 0 );
+                pxrEntryContinuations.clear();
+            }
+            else if ( TAG.TEXT.isTag( qName ) )
+            {
+                continuationText.setLength( 0 );
+            }
         }
     }
 
@@ -145,7 +169,11 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         if ( ( TAG.ENTRY.isTag( tag )
                 || TAG.COMMENT.isTag( tag ) ) )
         {
-            stringBuilder.append( ch, start, length );
+            entryText.append( ch, start, length );
+        }
+        else if ( TAG.TEXT.isTag( tag ) )
+        {
+            continuationText.append( ch, start, length );
         }
     }
 
@@ -153,146 +181,133 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     @Override
     public void endElement( String uri, String localName, String qName )
     {
-        if ( ( TAG.ENTRY.isTag( qName )
-                || TAG.COMMENT.isTag( qName )
-                || TAG.DELETE_ENTRY.isTag( qName )
-                || TAG.DELETE_COMMENT.isTag( qName ) ) )
+        if ( isUpdatableTag( qName ) )
         {
-            processUpdate( stringBuilder.toString() );
-
-            stringBuilder.setLength( 0 );
+            processUpdate( qName, entryKey );
         }
     }
 
 
-    private void processUpdate( String newCharacters )
+    private void processUpdate( String tag, String key )
     {
-        if ( ! ( TAG.ENTRY.isTag( tag )
-                || TAG.COMMENT.isTag( tag )
-                || TAG.DELETE_ENTRY.isTag( tag )
-                || TAG.DELETE_COMMENT.isTag( tag ) ) )
+        if ( ! isUpdatableTag( tag ) )
         {
             return;
         }
 
-        if ( key == null )
+        if ( TAG.TEXT.isTag( tag ) )
+        {
+            PxrEntryContinuation pec = new PxrEntryContinuation();
+            pec.setIndex( pxrEntryContinuations.size() );
+            pec.setCont( cont );
+            pec.setPrefix( prefix );
+            pec.setEol( eol );
+
+            pec.setValue( continuationText.toString() );
+            continuationText.setLength( 0 );
+
+            pxrEntryContinuations.add( pec );
+
+            return;
+        }
+        else if ( key == null )
         {
             throw new RuntimeException(
                     format( "Element <%s> has empty or missing attribute @key", tag ) );
         }
 
-        PxrEntry entry = pxrProperties.getEntryMap().get( key );
+        entryForUpdate = pxrProperties.getEntryMap().get( key );
 
-        final String actual = TAG.ENTRY.isTag( tag ) && nonNull( entry )
-                              ? entry.getValue()
-                              : ( TAG.COMMENT.isTag( tag ) && nonNull( pxrProperties.getComment( key ) ) )
-                                ? pxrProperties.getComment( key ).getText()
-                                : null;
+        final String actual = getActualValue( key );
 
-        final String newValue = isNull( contextValueMapper )
-                                ? newCharacters
-                                : contextValueMapper
-                                        .inContext()
-                                        .put( "$value", actual )
-                                        .map( key, newCharacters );
+        ACT action = TAG.DELETE_ENTRY.isTag( tag ) || TAG.DELETE_COMMENT.isTag( tag )
+                     ? ACT.DELETE
+                     : nonNull( entryForUpdate )
+                       ? ACT.UPDATE
+                       : ACT.INSERT;
 
-
-        // might switch action from update to confirm later!
-        final ACT[] action = {
-                TAG.DELETE_ENTRY.isTag( tag ) || TAG.DELETE_COMMENT.isTag( tag )
-                ? ACT.DELETE
-                : pxrProperties.getEntryMap().containsKey( key )
-                  ? ACT.UPDATE
-                  : ACT.INSERT
-        };
-
-
-        switch ( action[ 0 ] )
+        switch ( action )
         {
             case INSERT:
 
-                insertAtKey( pxrProperties, tag, key, newValue, linesBefore, eol );
-
+                insertAtKey( tag, key );
                 break;
-
 
             case UPDATE:
 
-                if ( expected != null && ! expected.equals( actual ) )
-                {
-                    handleError( action[ 0 ], key, expected, actual );
-                }
-                else if ( newValue.equals( actual ) )
-                {
-                    // switch action
-                    action[ 0 ] = ACT.CONFIRM;
-                }
-                else
-                {
-                    // not the exp:namespace
-                    if ( TAG.ENTRY.isTag( tag ) )
-                    {
-                        PxrEntry entryForUpdate = pxrProperties.getEntryMap().get( key );
-
-                        if ( isNull( entryForUpdate ) )
-                        {
-                            pxrProperties.append( new PxrEntry(
-                                    null,
-                                    pxrProperties.getEntries().size(),
-                                    key,
-                                    "=",
-                                    newValue,
-                                    true,
-                                    null ) );
-                        }
-                        else
-                        {
-                            entryForUpdate.setValue( newValue );
-                        }
-
-                    }
-                    else if ( TAG.COMMENT.isTag( tag ) )
-                    {
-                        PxrEntry entryForUpdate = pxrProperties.getEntryMap().get( key );
-
-                        if ( isNull( entryForUpdate ) )
-                        {
-                            // not found
-                            throw new RuntimeException( "No property to update with key: " + key );
-                        }
-                        else if ( isNull( entryForUpdate.getComment() ) )
-                        {
-                            entryForUpdate.setValue( newValue );
-                        }
-                        else
-                        {
-                            PxrComment comment = entryForUpdate.getComment();
-                            comment.getValue().setLength( 0 );
-                            comment.getValue().append( newValue );
-                        }
-                    }
-                }
-
+                checkExpected( action, key, expected, actual );
+                updateAtKey( tag, key );
                 break;
 
             case DELETE:
 
-                // 2014-10-21: allow if expected is null
-                // for delete, the "newValue" is expected
-                // unless its a sensitive key
-                if ( expected != null && ! newValue.equals( actual ) )
-                {
-                    handleError( action[ 0 ], key, newValue, actual );
-                }
-
-                deleteAtKey( pxrProperties, tag, key );
-
+                checkExpected( action, key, expected, actual );
+                deleteAtKey( tag, key );
                 break;
         }
     }
 
+    private String getActualValue( String key )
+    {
+        return nonNull( entryForUpdate )
 
-    private void insertAtKey( PxrProperties properties, String tag, String key, String newValue, int linesBefore, boolean eol )
+               ? TAG.ENTRY.isTag( tag ) || TAG.DELETE_ENTRY.isTag( tag )
+
+                 // the current entry value
+                 ? entryForUpdate.getValue()
+
+                 : ( TAG.COMMENT.isTag( tag ) || TAG.DELETE_COMMENT.isTag( tag ) ) && nonNull( entryForUpdate.getComment() )
+
+                   // the current entry comment value
+                   ? entryForUpdate.getComment().getText()
+
+                   : null
+
+               : ( TAG.COMMENT.isTag( tag ) || TAG.DELETE_COMMENT.isTag( tag ) ) && isHeaderOrFooterKey( key )
+
+                 ? HEADER_KEY.equals( key )
+
+                   ? nonNull( pxrProperties.getHeader() )
+
+                     // the header value
+                     ? pxrProperties.getHeader().getText()
+                     : null
+
+                   : nonNull( pxrProperties.getFooter() )
+
+                     // the header value
+                     ? pxrProperties.getFooter().getText()
+                     : null
+                 : null;
+    }
+
+
+    private String getNewValue()
+    {
+        PxrEntry pxrEntry = new PxrEntry();
+        pxrEntry.setContinuations( pxrEntryContinuations );
+        pxrEntry.setValue( entryText.toString() );
+        return pxrEntry.getText();
+    }
+
+    private void setEntryText( PxrEntry entry )
+    {
+        if ( nonNull( pxrEntryContinuations ) && pxrEntryContinuations.size() > 0 )
+        {
+            // overwriting any previous value
+            entry.setValue( null );
+            entry.setContinuations( new ArrayList< PxrEntryContinuation >( pxrEntryContinuations ) );
+        }
+        else
+        {
+            entry.setValue( entryText.toString() );
+        }
+
+        entryText.setLength( 0 );
+        pxrEntryContinuations.clear();
+    }
+
+    private void insertAtKey( String tag, String key )
     {
         if ( TAG.ENTRY.isTag( tag ) )
         {
@@ -305,63 +320,73 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
             if ( linesBefore > 0 )
             {
-                comment = new PxrComment(
-                        linesBefore - 1,
-                        key,
-                        eol,
-                        false
-                );
+                comment = new PxrComment();
+                comment.setLinesBefore( 1 );
+                comment.setKey( key );
+                comment.setEol( eol );
             }
 
-            PxrEntry entry = new PxrEntry(
-                    comment,
-                    properties.getEntries().size(),
-                    key,
-                    "=",
-                    newValue,
-                    eol,
-                    null
-            );
+            PxrEntry entry = new PxrEntry();
 
-            properties.append( entry );
+            entry.setComment( comment );
+            entry.setIndex( pxrProperties.getEntries().size() );
+            entry.setKey( key );
+            entry.setSep( sep );
+            entry.setEol( eol );
+
+            setEntryText( entry );
+
+            pxrProperties.append( entry );
         }
         else if ( TAG.COMMENT.isTag( tag ) )
         {
             if ( HEADER_KEY.equals( key ) )
             {
-                PxrComment comment = null;
+                PxrComment comment = new PxrComment();
+                comment.setLinesBefore( linesBefore );
+                comment.setKey( HEADER_KEY );
 
-                if ( linesBefore > 0 )
+                String newValue = entryText.toString();
+                entryText.setLength( 0 );
+
+                // ensure header creates two line breaks
+                if ( ! newValue.endsWith( "\n" ) )
                 {
-                    comment = new PxrComment(
-                            linesBefore,
-                            key,
-                            eol,
-                            false
-                    );
+                    newValue += "\n";
                 }
 
-                properties.setHeader( comment );
+                comment.ingest( null, null, newValue, true );
+
+                pxrProperties.setHeader( comment );
             }
             else if ( FOOTER_KEY.equals( key ) )
             {
-                PxrComment comment = null;
+                PxrComment comment = new PxrComment();
 
-                if ( linesBefore > 0 )
+                comment.setLinesBefore( linesBefore );
+                comment.setKey( FOOTER_KEY );
+
+                if ( ! pxrProperties.endsWithEol() )
                 {
-                    comment = new PxrComment(
-                            linesBefore,
-                            key,
-                            eol,
-                            false
-                    );
+                    pxrProperties.appendEol();
                 }
 
-                properties.setFooter( comment );
+                String newValue = entryText.toString();
+                entryText.setLength( 0 );
+
+                comment.ingest( null, null, newValue, eol );
+
+                pxrProperties.setFooter( comment );
             }
             else
             {
-                PxrComment comment = new PxrComment( linesBefore, key, false, false );
+                PxrComment comment = new PxrComment();
+
+                comment.setLinesBefore( linesBefore );
+                comment.setKey( key );
+
+                String newValue = entryText.toString();
+                entryText.setLength( 0 );
 
                 comment.ingest( null, null, newValue, eol );
 
@@ -371,42 +396,99 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     }
 
 
-    private void deleteAtKey( PxrProperties properties, String tag, String key )
+    private void updateAtKey( String tag, String key )
     {
-        if ( TAG.DELETE_ENTRY.isTag( tag ) )
-        {
-            properties.remove( key );
-        }
-        else if ( TAG.DELETE_COMMENT.isTag( tag ) )
-        {
-            if ( HEADER_KEY.equals( key ) )
-            {
-                properties.setHeader( null );
-            }
-            else if ( FOOTER_KEY.equals( key ) )
-            {
-                properties.setFooter( null );
-            }
-            else
-            {
-                PxrEntry entry = properties.getEntryMap().get( key );
+        final String actual = getActualValue( key );
+        final String newValue = getNewValue();
 
-                if ( nonNull( entry ) )
+        // ignore if no change
+        if ( ! newValue.equals( actual ) )
+        {
+            if ( TAG.ENTRY.isTag( tag ) )
+            {
+                if ( isNull( entryForUpdate ) )
                 {
-                    entry.setComment( null );
+                    PxrEntry entry = new PxrEntry();
+
+                    entry.setIndex( pxrProperties.getEntries().size() );
+                    entry.setKey( key );
+                    entry.setSep( sep );
+                    entry.setEol( eol );
+
+                    setEntryText( entry );
+
+                    pxrProperties.append( entry );
+                }
+                else
+                {
+                    setEntryText( entryForUpdate );
+                }
+            }
+            else if ( TAG.COMMENT.isTag( tag ) )
+            {
+                if ( isNull( entryForUpdate ) )
+                {
+                    throw new RuntimeException( "No property to update with key: " + key );
+                }
+                else if ( isNull( entryForUpdate.getComment() ) )
+                {
+                    entryForUpdate.setValue( newValue );
+                }
+                else
+                {
+                    PxrComment comment = entryForUpdate.getComment();
+                    comment.getValue().setLength( 0 );
+                    comment.getValue().append( newValue );
                 }
             }
         }
     }
 
 
+    private void deleteAtKey( String tag, String key )
+    {
+        if ( TAG.DELETE_ENTRY.isTag( tag ) )
+        {
+            pxrProperties.remove( key );
+        }
+        else if ( TAG.DELETE_COMMENT.isTag( tag ) )
+        {
+            if ( HEADER_KEY.equals( key ) )
+            {
+                pxrProperties.setHeader( null );
+            }
+            else if ( FOOTER_KEY.equals( key ) )
+            {
+                pxrProperties.setFooter( null );
+            }
+            else if ( nonNull( entryForUpdate ) )
+            {
+                entryForUpdate.setComment( null );
+            }
+        }
+    }
+
+    public static void checkExpected( ACT action, String key, String expected, String actual )
+    {
+        if ( expected != null && ! expected.equals( actual ) )
+        {
+            throw new ACTException( action, key, expected, actual );
+        }
+    }
+
     public static boolean isHeaderOrFooterKey( String key )
     {
         return HEADER_KEY.equals( key ) || FOOTER_KEY.equals( key );
     }
 
-    private static void handleError( ACT action, String key, String expected, String actual )
+
+    public static boolean isUpdatableTag( String tag )
     {
-        throw new ACTException( action, key, expected, actual );
+        return ( TAG.ENTRY.isTag( tag )
+                || TAG.COMMENT.isTag( tag )
+                || TAG.DELETE_ENTRY.isTag( tag )
+                || TAG.DELETE_COMMENT.isTag( tag )
+                || TAG.TEXT.isTag( tag )
+        );
     }
 }

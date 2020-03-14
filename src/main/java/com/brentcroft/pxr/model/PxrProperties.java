@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import java.util.*;
 
-import static com.brentcroft.pxr.PxrUtils.isNull;
 import static com.brentcroft.pxr.PxrUtils.nonNull;
 
 
@@ -52,26 +51,6 @@ public class PxrProperties implements PxrItem
         }
     }
 
-
-    public PxrComment getComment( String key )
-    {
-        if ( HEADER_KEY.equals( key ) )
-        {
-            return getHeader();
-        }
-        else if ( FOOTER_KEY.equals( key ) )
-        {
-            return getFooter();
-        }
-
-        PxrEntry entry = entryMap.get( key );
-
-        return isNull( entry )
-               ? null
-               : entry.getComment();
-    }
-
-
     public Properties getProperties()
     {
         Properties p = new Properties();
@@ -82,5 +61,35 @@ public class PxrProperties implements PxrItem
         }
 
         return p;
+    }
+
+    public boolean endsWithEol()
+    {
+        if ( nonNull( getFooter() ) )
+        {
+            return getFooter().isEol();
+        }
+        else if ( getEntries().size() > 0 )
+        {
+            return getEntries().get( getEntries().size() - 1 ).isEol();
+        }
+        else if ( nonNull( getHeader() ) )
+        {
+            return getHeader().isEol();
+        }
+
+        return false;
+    }
+
+    public void appendEol()
+    {
+        if ( nonNull( getFooter() ) )
+        {
+            getFooter().setEol( true );
+        }
+        else if ( getEntries().size() > 0 )
+        {
+            getEntries().get( getEntries().size() - 1 ).setEol( true );
+        }
     }
 }

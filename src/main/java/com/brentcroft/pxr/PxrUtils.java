@@ -29,7 +29,7 @@ public class PxrUtils
 
     public static boolean nonNull( Object o )
     {
-        return !isNull( o );
+        return ! isNull( o );
     }
 
 
@@ -91,10 +91,16 @@ public class PxrUtils
         );
     }
 
-
     public static PxrProperties getPxrProperties( InputStream inputStream ) throws ParseException
     {
-        return new PxrParser( inputStream ).parse();
+        return getPxrProperties( inputStream, null );
+    }
+
+    public static PxrProperties getPxrProperties( InputStream inputStream, String encoding ) throws ParseException
+    {
+        return nonNull( encoding )
+               ? new PxrParser( inputStream, encoding ).parse()
+               : new PxrParser( inputStream ).parse();
     }
 
 

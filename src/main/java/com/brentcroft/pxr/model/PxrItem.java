@@ -24,8 +24,7 @@ public interface PxrItem
     {
         INSERT,
         UPDATE,
-        DELETE,
-        CONFIRM
+        DELETE
     }
 
 

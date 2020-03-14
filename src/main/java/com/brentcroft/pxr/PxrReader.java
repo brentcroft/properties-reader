@@ -1,10 +1,7 @@
 package com.brentcroft.pxr;
 
 
-import com.brentcroft.pxr.model.AbstractXMLReader;
-import com.brentcroft.pxr.model.PxrEntry;
-import com.brentcroft.pxr.model.PxrItem;
-import com.brentcroft.pxr.model.PxrProperties;
+import com.brentcroft.pxr.model.*;
 import com.brentcroft.pxr.parser.ParseException;
 import com.brentcroft.pxr.parser.PxrParser;
 import com.brentcroft.pxr.parser.TokenMgrError;
@@ -17,19 +14,18 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import static com.brentcroft.pxr.PxrUtils.isNull;
 import static com.brentcroft.pxr.PxrUtils.nonNull;
-import static com.brentcroft.pxr.model.PxrItem.NAMESPACE_URI;
 
 /**
  * Parses a Properties Text InputStream into a sequence of SAX Events.
  */
 @Getter
 @Setter
-public class PxrReader extends AbstractXMLReader
+public class PxrReader extends AbstractXMLReader implements PxrItem
 {
     private boolean systemIdAttribute = false;
     private boolean entriesOnly = false;
 
-    private String encoding;
+    private String encoding = "UTF-8";
 
     private PxrProperties pxrProperties;
 
@@ -40,9 +36,9 @@ public class PxrReader extends AbstractXMLReader
         {
             if ( inputSource instanceof PxrInputSource )
             {
-                pxrProperties = ( (PxrInputSource) inputSource ).getPxrProperties();
+                pxrProperties = ( ( PxrInputSource ) inputSource ).getPxrProperties();
             }
-            else if (nonNull(encoding))
+            else if ( nonNull( encoding ) )
             {
                 pxrProperties = new PxrParser( inputSource.getByteStream(), encoding )
                         .parse();
@@ -70,7 +66,6 @@ public class PxrReader extends AbstractXMLReader
         }
     }
 
-
     public void parse( PxrProperties pxrProperties ) throws SAXException
     {
         if ( isNull( getContentHandler() ) )
@@ -80,26 +75,20 @@ public class PxrReader extends AbstractXMLReader
 
         if ( entriesOnly )
         {
-            emitEntries( pxrProperties, getContentHandler() );
+            emitEntries( pxrProperties );
         }
         else
         {
-            emitProperties( pxrProperties, getContentHandler() );
+            emitProperties( pxrProperties );
         }
     }
 
-    private static void emitEntries( PxrProperties pxrProperties, ContentHandler contentHandler ) throws SAXException
+    private void emitProperties( PxrProperties pxrProperties ) throws SAXException
     {
-        for ( PxrEntry entry : pxrProperties.getEntries() )
-        {
-            entry.emitEntry( contentHandler );
-        }
-    }
+        final ContentHandler contentHandler = getContentHandler();
 
-    private static void emitProperties( PxrProperties pxrProperties, ContentHandler contentHandler ) throws SAXException
-    {
-        PxrItem.TAG tag = PxrItem.TAG.PROPERTIES;
-        AttributesImpl atts = new AttributesImpl();
+        final TAG tag = PxrItem.TAG.PROPERTIES;
+        final AttributesImpl atts = new AttributesImpl();
 
         if ( nonNull( pxrProperties.getSystemId() ) )
         {
@@ -107,23 +96,168 @@ public class PxrReader extends AbstractXMLReader
         }
 
         contentHandler.startDocument();
+        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
+
+        emitEntries( pxrProperties );
+
+        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
+        contentHandler.endDocument();
+    }
+
+    private void emitEntries( PxrProperties pxrProperties ) throws SAXException
+    {
+        if ( nonNull( pxrProperties.getHeader() ) )
+        {
+            emitComment( pxrProperties.getHeader() );
+        }
+        for ( PxrEntry entry : pxrProperties.getEntries() )
+        {
+            emitEntry( entry );
+        }
+        if ( nonNull( pxrProperties.getFooter() ) )
+        {
+            emitComment( pxrProperties.getFooter() );
+        }
+    }
+
+    private void emitComment( PxrComment comment ) throws SAXException
+    {
+        final ContentHandler contentHandler = getContentHandler();
+
+        final PxrItem.TAG tag = PxrItem.TAG.COMMENT;
+        final AttributesImpl atts = new AttributesImpl();
+
+        PxrItem.ATTR.KEY.setAttribute( atts, NAMESPACE_URI, comment.getKey() );
+
+        if ( comment.getLinesBefore() > 0 )
+        {
+            PxrItem.ATTR.LINES_BEFORE.setAttribute( atts, NAMESPACE_URI, String.valueOf( comment.getLinesBefore() ) );
+        }
+
+        if ( ! comment.isEol() )
+        {
+            PxrItem.ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );
+        }
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
 
-        if ( nonNull( pxrProperties.getHeader() ) )
+        if ( nonNull( comment.getValue() ) && comment.getValue().length() > 0 )
         {
-            pxrProperties.getHeader().emitEntry( contentHandler );
-        }
+            char[] characters = comment.getValue().toString().toCharArray();
 
-        emitEntries( pxrProperties, contentHandler );
-
-        if ( nonNull( pxrProperties.getFooter() ) )
-        {
-            pxrProperties.getFooter().emitEntry( contentHandler );
+            contentHandler.characters( characters, 0, characters.length );
         }
 
         contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
+    }
 
-        contentHandler.endDocument();
+    private void emitEntry( PxrEntry entry ) throws SAXException
+    {
+        if ( nonNull( entry.getComment() ) )
+        {
+            emitComment( entry.getComment() );
+        }
+
+        final ContentHandler contentHandler = getContentHandler();
+
+        final TAG tag = PxrItem.TAG.ENTRY;
+        final AttributesImpl atts = new AttributesImpl();
+
+        ATTR.KEY.setAttribute( atts, NAMESPACE_URI, entry.getKey() );
+        ATTR.INDEX.setAttribute( atts, NAMESPACE_URI, String.valueOf( entry.getIndex() ) );
+
+        // ignoring most common case
+        if ( ! "=".equals( entry.getSep() ) )
+        {
+            ATTR.SEP.setAttribute(
+                    atts,
+                    NAMESPACE_URI,
+                    isNull( entry.getSep() ) ? "" : entry.getSep() );
+        }
+
+        // ignoring most common case
+        if ( ! entry.isEol() )
+        {
+            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );
+        }
+
+        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
+
+        if ( isNull( entry.getContinuations() ) )
+        {
+            if ( nonNull( entry.getValue() ) )
+            {
+                char[] characters = entry.getValue().toCharArray();
+
+                contentHandler.characters( characters, 0, characters.length );
+            }
+        }
+        else
+        {
+            if ( nonNull( entry.getValue() ) )
+            {
+                emitValueAsZerothContinuation( entry.getValue() );
+            }
+
+            for ( PxrEntryContinuation rec : entry.getContinuations() )
+            {
+                emitContinuation( rec );
+            }
+        }
+
+        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
+    }
+
+    private void emitValueAsZerothContinuation( String value ) throws SAXException
+    {
+        final ContentHandler contentHandler = getContentHandler();
+        final TAG tag = PxrItem.TAG.TEXT;
+        final AttributesImpl atts = new AttributesImpl();
+
+        ATTR.KEY.setAttribute( atts, NAMESPACE_URI, "0" );
+
+        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
+
+        char[] characters = value.toCharArray();
+
+        contentHandler.characters( characters, 0, characters.length );
+
+        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
+    }
+
+
+    public void emitContinuation( PxrEntryContinuation continuation ) throws SAXException
+    {
+        final ContentHandler contentHandler = getContentHandler();
+        TAG tag = TAG.TEXT;
+        AttributesImpl atts = new AttributesImpl();
+
+        ATTR.KEY.setAttribute( atts, NAMESPACE_URI, String.valueOf( continuation.getIndex() ) );
+
+        if ( nonNull( continuation.getCont() ) )
+        {
+            ATTR.CONT.setAttribute( atts, NAMESPACE_URI, continuation.getCont() );
+        }
+
+        if ( nonNull( continuation.getPrefix() ) )
+        {
+            ATTR.PREFIX.setAttribute( atts, NAMESPACE_URI, continuation.getPrefix() );
+        }
+
+        if ( ! continuation.isEol() )
+        {
+            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "false" );
+        }
+
+        contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
+
+        if ( nonNull( continuation.getValue() ) )
+        {
+            char[] characters = continuation.getValue().toCharArray();
+
+            contentHandler.characters( characters, 0, characters.length );
+        }
+
+        contentHandler.endElement( NAMESPACE_URI, tag.getTag(), tag.getTag() );
     }
 }

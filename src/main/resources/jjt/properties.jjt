@@ -2,7 +2,7 @@
 options {
     OUTPUT_DIRECTORY = "src/main/java/com/brentcroft/pxr/parser";
     ERROR_REPORTING = true;
-    UNICODE_INPUT=true;
+    UNICODE_INPUT = true;
     STATIC = false;
 }
 
@@ -37,8 +37,6 @@ TOKEN :
     | <HASH:  "#" ( <SPACE> )? >
     | <EQUALS:  "=" >
     | <COLON:  ":" >
-    // non-standard generous continuation
-    // allows anything (including adjacent backslashes) up to linebreak
     | <CONT:  "\\" ( ~[ "\n", "\r", "\\" ] )* >
     | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " " ] )+ >
 }
@@ -52,8 +50,8 @@ PxrProperties parse() :
     String key = null;
     String sep = null;
     PxrComment comment = null;
-    List<PxrEntryContinuation> cont = null;
-    PxrProperties rp = new PxrProperties();
+    List<PxrEntryContinuation> pecs = null;
+    PxrProperties pxrProperties = new PxrProperties();
     int entryIndex = 1;
 }
 {
@@ -63,28 +61,28 @@ PxrProperties parse() :
                 ( eol = eol() )
                 | ( space = space() )
                 | init = initiator() ( LOOKAHEAD(2) text = text() )? ( LOOKAHEAD(2) eol = eol() )?
-                | key = key() ( LOOKAHEAD(2) sep = sep() ( LOOKAHEAD(2) text = text() ( cont = continuations() )? )? )? ( LOOKAHEAD(2) eol = eol() )?
+                | key = key() ( LOOKAHEAD(2) sep = sep() ( LOOKAHEAD(2) text = text() ( pecs = continuations() )? )? )? ( LOOKAHEAD(2) eol = eol() )?
             )
             {
                 if ( isNull( key ) )
                 {
                     if (isNull( comment ))
                     {
-                        comment = new PxrComment( 0, FOOTER_KEY, false, false );
+                        comment = new PxrComment();
+                        comment.setKey( FOOTER_KEY );
                     }
-                    else if ( isNull( rp.getHeader() )
-                            && rp.isEmpty()
-                            && comment.isEol()
-                            && eol
-                            && comment.isCharactersWritten()
-                            && isNull( space )
-                            && isNull( init ) )
+                    // maybe header
+                    else if (
+                            isNull( pxrProperties.getHeader() ) && pxrProperties.isEmpty()
+                            && comment.isCharactersWritten() && comment.isEol()
+                            && eol && isNull( space ) && isNull( init ) )
                     {
                         comment.setKey( HEADER_KEY );
 
-                        rp.setHeader( comment );
+                        pxrProperties.setHeader( comment );
 
-                        comment = new PxrComment( 0, FOOTER_KEY, false, false );
+                        comment = new PxrComment();
+                        comment.setKey( FOOTER_KEY );
                     }
 
                     comment.ingest( space,  init, text, eol );
@@ -96,7 +94,17 @@ PxrProperties parse() :
                         comment.setKey( key );
                     }
 
-                    rp.append( new PxrEntry( comment, entryIndex++, key, sep, text, eol, cont ) );
+                    PxrEntry pe = new PxrEntry();
+
+                    pe.setComment( comment );
+                    pe.setIndex( entryIndex++ );
+                    pe.setKey( key );
+                    pe.setSep( sep );
+                    pe.setValue( text );
+                    pe.setEol( eol );
+                    pe.setContinuations( pecs );
+
+                    pxrProperties.append( pe );
 
                     comment = null;
                 }
@@ -105,14 +113,14 @@ PxrProperties parse() :
                 text = null;
                 eol = false;
                 key= null;
-                cont = null;
+                pecs = null;
             }
         )+ | <EOF>
     )
     {
-        rp.setFooter( comment );
+        pxrProperties.setFooter( comment );
 
-        return rp;
+        return pxrProperties;
     }
 }
 
@@ -157,7 +165,7 @@ List<PxrEntryContinuation> continuations() :
     boolean eol = false;
     String space = null;
     String value = null;
-    List<PxrEntryContinuation> cont = new ArrayList<PxrEntryContinuation>();
+    List<PxrEntryContinuation> pecs = new ArrayList<PxrEntryContinuation>();
     int index = 1;
 }
 {
@@ -169,11 +177,21 @@ List<PxrEntryContinuation> continuations() :
                 space = space()
                 ( LOOKAHEAD(2) value = text() )?
             )?
-            { cont.add( new PxrEntryContinuation( index++, t.image, space, value, eol ) ); }
+            {
+                PxrEntryContinuation pec = new PxrEntryContinuation( );
+
+                pec.setIndex( index++ );
+                pec.setCont( t.image );
+                pec.setPrefix( space );
+                pec.setValue( value );
+                pec.setEol( eol );
+
+                pecs.add( pec );
+            }
         )
     )+
     {
-        return cont;
+        return pecs;
     }
 }
 

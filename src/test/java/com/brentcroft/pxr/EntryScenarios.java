@@ -116,7 +116,6 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    @Ignore
     public void weird_text() throws TransformerException
     {
         runRoundTrip(
@@ -125,9 +124,26 @@ public class EntryScenarios extends AbstractScenarios
 
                 "<properties>" +
                         "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
-                        "</properties>",
-
-                "UTF-8"
+                        "</properties>"
         );
+    }
+
+    @Test
+    public void weird_text_wrong_encoding() throws TransformerException
+    {
+        given()
+                .properties_text( "# the “allow” to" );
+
+        when()
+                .transform_text_to_xml_text( "ISO-8859-1" );
+
+        then()
+                .xml_text_not_equals( "<properties>" +
+                        "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
+                        "</properties>" );
+        when()
+                .transform_xml_to_properties_text();
+        then()
+                .different_properties_text();
     }
 }
