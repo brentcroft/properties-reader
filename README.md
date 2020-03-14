@@ -14,17 +14,15 @@ A JavaCC grammar generates the PxrParser which parses PxrProperties objects from
 
  - [Properties grammar file](src/main/resources/jjt/properties.jjt)
 
- - <a href="src/main/resources/jjt/properties.html" target="_new">Properties EBNF file</a>
-
 ## PxrReader
 A PxrReader generates emits SAX events from a PxrProperties object.
 
- - [PxrReader](src/main/java/com/brentcroft.pxr.PxrReader)
+ - [PxrReader](src/main/java/com/brentcroft/pxr/PxrReader.java)
 
 ## PxrWriter
 A PxrWriter handles SAX events to create or update a PxrProperties object.
 
- - [PxrWriter](src/main/java/com/brentcroft.pxr.PxrWriter)
+ - [PxrWriter](src/main/java/com/brentcroft/pxr/PxrWriter.java)
 
 ## XSL Transform
 
