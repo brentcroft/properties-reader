@@ -20,7 +20,7 @@ A JavaCC grammar generates the PxrParser which parses PxrProperties objects from
  - [Properties grammar file](src/main/resources/jjt/properties.jjt)
 
 ## PxrReader
-A PxrReader generates emits SAX events from a PxrProperties object.
+A PxrReader emits SAX events from a PxrProperties object.
 
 For example, given the following properties text:
 
@@ -87,5 +87,5 @@ size=large
  - [PxrWriter](src/main/java/com/brentcroft/pxr/PxrWriter.java)
 
 ## XSL Transform
-An XSL transform generates a properties text from SAX events:
+An XSL transform re-constitutes properties text from SAX events:
  - [Properties file builder](src/main/resources/xslt/properties.xslt)
