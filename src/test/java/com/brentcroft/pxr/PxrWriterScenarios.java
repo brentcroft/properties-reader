@@ -25,9 +25,26 @@ public class PxrWriterScenarios extends AbstractScenarios
                         "\n" +
                         "#sample footer" );
         when()
-                .parse_text_to_pxr_properties();
+                .parse_text_to_pxr_properties()
+                .transform_pxr_to_properties_xml();
         then()
-                .pxr_properties_is_not_null();
+                .pxr_properties_is_not_null()
+                .xml_text_equals( PROLOG +
+                        "<properties>\n" +
+                        "    <comment key='_header'>\n" +
+                        "        <![CDATA[#sample header]]>\n" +
+                        "    </comment>\n" +
+                        "    <comment key='color'/>\n" +
+                        "    <entry key='color' index='1'>red</entry>\n" +
+                        "    <comment key='size' lines-before='1'>\n" +
+                        "        <![CDATA[#the size is large]]>\n" +
+                        "    </comment>\n" +
+                        "    <entry key='size' index='2'>large</entry>\n" +
+                        "    <comment key='_footer' lines-before='1' eol='0'>\n" +
+                        "        <![CDATA[#sample footer]]>\n" +
+                        "    </comment>\n" +
+                        "</properties>" + EPILOG );
+
         when()
                 .transform_pxr_to_properties_text();
         then()
@@ -312,14 +329,14 @@ public class PxrWriterScenarios extends AbstractScenarios
     public void line_continuation() throws Exception
     {
         given()
-            .properties_text( "color=red\nsize=large" )
-            .properties_xml( PROLOG +
-                    "<update>\n" +
-                    "    <entry key='color'>\n" +
-                    "        <text>blue, </text>\n" +
-                    "        <text cont='\\' prefix='    ' >red</text>\n" +
-                    "    </entry>\n" +
-                    "</update>" + EPILOG );
+                .properties_text( "color=red\nsize=large" )
+                .properties_xml( PROLOG +
+                        "<update>\n" +
+                        "    <entry key='color'>\n" +
+                        "        <text>blue, </text>\n" +
+                        "        <text cont='\\' prefix='    ' >red</text>\n" +
+                        "    </entry>\n" +
+                        "</update>" + EPILOG );
         when()
                 .parse_text_to_pxr_properties()
                 .update_pxr_properties()

@@ -104,6 +104,32 @@ public class PxrUtils
     }
 
 
+
+    public static void pxrPropertiesToXml( PxrProperties pxrProperties, Writer writer ) throws TransformerException
+    {
+        Transformer transformer = SAXTransformerFactory
+                .newInstance()
+                .newTransformer();
+
+        transformer.setOutputProperty( OutputKeys.METHOD, "xml" );
+        transformer.setOutputProperty( OutputKeys.INDENT, "yes" );
+        transformer.setOutputProperty( OutputKeys.OMIT_XML_DECLARATION, "yes" );
+        transformer.setOutputProperty( OutputKeys.CDATA_SECTION_ELEMENTS, PxrItem.TAGS_FOR_CATA_TEXT );
+        transformer.setOutputProperty( OutputKeys.ENCODING, "UTF-8" );
+
+        final int indent = 4;
+
+        transformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", Integer.toString( indent ) );
+
+        transformer.transform(
+                new SAXSource(
+                        new PxrReader(),
+                        new PxrInputSource( pxrProperties )
+                ),
+                new StreamResult( writer )
+        );
+    }
+
     public static void pxrPropertiesToText( PxrProperties pxrProperties, Writer writer ) throws TransformerException
     {
         if ( isNull( PXR_TEMPLATES ) )

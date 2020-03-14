@@ -83,6 +83,17 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
+    public WhenProperties transform_pxr_to_properties_xml() throws TransformerException
+    {
+        StringWriter baos = new StringWriter();
+
+        PxrUtils.pxrPropertiesToXml( pxrProperties, baos );
+
+        propertiesXml = baos.toString();
+
+        return self();
+    }
+
     public WhenProperties update_pxr_properties() throws ParserConfigurationException, SAXException, IOException
     {
         PxrWriter pxrWriter = new PxrWriter();
