@@ -292,14 +292,15 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     private void setEntryText( PxrEntry entry )
     {
+        // overwriting any previous text contributors
         if ( nonNull( pxrEntryContinuations ) && pxrEntryContinuations.size() > 0 )
         {
-            // overwriting any previous value
             entry.setValue( null );
             entry.setContinuations( new ArrayList< PxrEntryContinuation >( pxrEntryContinuations ) );
         }
         else
         {
+            entry.setContinuations( null );
             entry.setValue( entryText.toString() );
         }
 

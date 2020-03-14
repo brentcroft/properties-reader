@@ -210,6 +210,24 @@ public class PxrWriterScenarios extends AbstractScenarios
                                 "#the size is large\n" +
                                 "size=large\n" );
 
+        given()
+                .properties_xml( PROLOG +
+                        "<update>\n" +
+                        "   <comment key='_header'>new header</comment>\n" +
+                        "</update>" + EPILOG );
+
+        when()
+                .parse_text_to_pxr_properties()
+                .update_pxr_properties()
+                .transform_pxr_to_properties_text();
+        then()
+                .transform_result_is(
+                        "#new header\n" +
+                                "\n" +
+                                "color=red\n" +
+                                "\n" +
+                                "#the size is large\n" +
+                                "size=large\n" );
 
         given()
                 .properties_xml( PROLOG +
@@ -267,6 +285,20 @@ public class PxrWriterScenarios extends AbstractScenarios
         given()
                 .properties_xml( PROLOG +
                         "<update>\n" +
+                        "   <comment key='_footer' lines-before='2' eol='false'>new footer</comment>\n" +
+                        "</update>" + EPILOG );
+        when()
+                .apply_update();
+        then()
+                .transform_result_is( "" +
+                        "size=large\n" +
+                        "\n\n" +
+                        "#new footer" );
+
+
+        given()
+                .properties_xml( PROLOG +
+                        "<update>\n" +
                         "   <exp:comment key='_footer'/>\n" +
                         "</update>" + EPILOG );
         when()
@@ -277,17 +309,17 @@ public class PxrWriterScenarios extends AbstractScenarios
 
 
     @Test
-    public void line_continuations() throws Exception
+    public void line_continuation() throws Exception
     {
         given()
-                .properties_text( "color=red\nsize=large" )
-                .properties_xml( PROLOG +
-                        "<update>\n" +
-                        "    <entry key='color'>\n" +
-                        "        <text key='0'>blue, </text>\n" +
-                        "        <text key='1' cont='\\' prefix='    ' >red</text>\n" +
-                        "    </entry>\n" +
-                        "</update>" + EPILOG );
+            .properties_text( "color=red\nsize=large" )
+            .properties_xml( PROLOG +
+                    "<update>\n" +
+                    "    <entry key='color'>\n" +
+                    "        <text>blue, </text>\n" +
+                    "        <text cont='\\' prefix='    ' >red</text>\n" +
+                    "    </entry>\n" +
+                    "</update>" + EPILOG );
         when()
                 .parse_text_to_pxr_properties()
                 .update_pxr_properties()
@@ -295,7 +327,22 @@ public class PxrWriterScenarios extends AbstractScenarios
         then()
                 .transform_result_is( "" +
                         "color=blue, \\\n" +
-                        "    red\nsize=large" );
-    }
+                        "    red\n" +
+                        "size=large" );
 
+        given()
+                .properties_text_from_transform_result()
+                .properties_xml( PROLOG +
+                        "<update>\n" +
+                        "    <entry key='color'>green</entry>\n" +
+                        "</update>" + EPILOG );
+        when()
+                .parse_text_to_pxr_properties()
+                .update_pxr_properties()
+                .transform_pxr_to_properties_text();
+        then()
+                .transform_result_is( "" +
+                        "color=green\n" +
+                        "size=large" );
+    }
 }

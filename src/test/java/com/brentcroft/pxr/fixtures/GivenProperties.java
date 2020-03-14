@@ -3,6 +3,7 @@ package com.brentcroft.pxr.fixtures;
 import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.As;
 import com.tngtech.jgiven.annotation.ProvidedScenarioState;
+import com.tngtech.jgiven.annotation.ScenarioState;
 
 import java.io.*;
 import java.net.URL;
@@ -16,10 +17,20 @@ public class GivenProperties extends Stage<GivenProperties>
     @ProvidedScenarioState
     String propertiesXml;
 
+    @ScenarioState
+    String transformResult;
+
     @As("properties text: \n[$]\n")
     public GivenProperties properties_text( String propertiesText )
     {
         this.propertiesText = propertiesText;
+
+        return self();
+    }
+
+    public GivenProperties properties_text_from_transform_result( )
+    {
+        this.propertiesText = transformResult;
 
         return self();
     }
