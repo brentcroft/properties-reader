@@ -14,7 +14,7 @@ A JavaCC grammar generates the PxrParser which parses PxrProperties objects from
 
  - [Properties grammar file](src/main/resources/jjt/properties.jjt)
 
- - <a href="src/main/resources/jjt/properties.html">Properties EBNF file</a>
+ - <a href="src/main/resources/jjt/properties.html" target="_new">Properties EBNF file</a>
 
 ## PxrReader
 A PxrReader generates emits SAX events from a PxrProperties object.
