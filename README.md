@@ -72,7 +72,7 @@ when the following SAX events are handled:
 <update>
     <entry key='color'>
         <text>blue, </text>
-        <text cont='\' prefix='    ' >red</text>
+        <text prefix='    ' >red</text>
     </entry>
 </update>
 ```

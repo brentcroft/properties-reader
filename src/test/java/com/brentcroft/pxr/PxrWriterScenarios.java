@@ -334,7 +334,7 @@ public class PxrWriterScenarios extends AbstractScenarios
                         "<update>\n" +
                         "    <entry key='color'>\n" +
                         "        <text>blue, </text>\n" +
-                        "        <text cont='\\' prefix='    ' >red</text>\n" +
+                        "        <text prefix='    ' >red</text>\n" +
                         "    </entry>\n" +
                         "</update>" + EPILOG );
         when()
