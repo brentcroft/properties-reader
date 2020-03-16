@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet
+        version="1.0"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:pxrutils="xalan://com.brentcroft.pxr.PxrUtils">
 
     <xsl:output method="text" version="1.0" encoding="UTF-8"/>
 
@@ -23,11 +26,13 @@
     </xsl:template>
 
     <xsl:template match="comment">
-        <xsl:variable name="text" select="."/>
+        <xsl:variable name="text" select="text()"/>
         <xsl:call-template name="lines-before">
             <xsl:with-param name="lines" select="number( @lines-before )"/>
         </xsl:call-template>
-        <xsl:if test="string-length( normalize-space( $text ) ) &gt; 1 and not( starts-with( $text, '#' ) )"><xsl:text>#</xsl:text></xsl:if>
+        <xsl:if test="string-length( normalize-space( $text ) ) &gt; 1 and not( starts-with( $text, '#' ) )">
+            <xsl:text>#</xsl:text>
+        </xsl:if>
         <xsl:value-of select="$text"/>
         <xsl:if test="not( @eol = 0 )">
             <xsl:text>&#10;</xsl:text>
@@ -38,14 +43,20 @@
         <xsl:call-template name="lines-before">
             <xsl:with-param name="lines" select="number( @lines-before )"/>
         </xsl:call-template>
-        <xsl:value-of select="@key"/>
+        <xsl:value-of select="pxrutils:escapeKey( @key )"/>
         <xsl:choose>
-            <xsl:when test="@sep"><xsl:value-of select="@sep"/></xsl:when>
+            <xsl:when test="@sep">
+                <xsl:value-of select="@sep"/>
+            </xsl:when>
             <xsl:otherwise>=</xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
-            <xsl:when test="text"><xsl:apply-templates select="text"/></xsl:when>
-            <xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+            <xsl:when test="text">
+                <xsl:apply-templates select="text"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="pxrutils:escapeValue( text() )"/>
+            </xsl:otherwise>
         </xsl:choose>
         <xsl:if test="not( @eol = 0 )">
             <xsl:text>&#10;</xsl:text>
@@ -53,13 +64,19 @@
     </xsl:template>
 
     <xsl:template match="text">
+        <xsl:variable name="value" select="text()"/>
         <xsl:choose>
-            <xsl:when test="@key='0'"><xsl:value-of select="."/></xsl:when>
+            <xsl:when test="( @key = '0' )"><xsl:value-of select="$value"/></xsl:when>
+            <xsl:when test="( @eol = '0' ) and not( $value ) and not( @prefix )">
+                <xsl:text>\</xsl:text>
+            </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="@cont"/>
-                <xsl:text>&#10;</xsl:text>
+                <xsl:text>\</xsl:text>
+                <xsl:if test="not( @eol = '0' ) or $value or @prefix">
+                    <xsl:text>&#10;</xsl:text>
+                </xsl:if>
                 <xsl:value-of select="@prefix"/>
-                <xsl:value-of select="."/>
+                <xsl:value-of select="pxrutils:escapeValue( $value )"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

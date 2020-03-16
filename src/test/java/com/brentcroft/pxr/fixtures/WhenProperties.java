@@ -15,6 +15,7 @@ import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 
 import static com.brentcroft.pxr.PxrUtils.*;
 
@@ -36,12 +37,12 @@ public class WhenProperties extends Stage< WhenProperties >
     PxrProperties pxrProperties;
 
 
-    public WhenProperties transform_text_to_xml_text( String encoding ) throws TransformerException
+    public WhenProperties transform_text_to_xml_text( String encoding ) throws TransformerException, UnsupportedEncodingException
     {
         StringWriter baos = new StringWriter();
 
         propertiesTextToXmlText(
-                new ByteArrayInputStream( propertiesText.getBytes() ),
+                new ByteArrayInputStream( propertiesText.getBytes( encoding ) ),
                 baos,
                 encoding
         );

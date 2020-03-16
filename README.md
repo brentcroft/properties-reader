@@ -8,7 +8,7 @@ this kit attempts to provide 100% round trip fidelity
 between Java properties text and a simple XML form (extending the Java properties XML specification) 
 via a simple object model (PxrProperties).
 
-The XML form is extended to support insert, update and delete actions on all parts of a properties text.
+The XML form is further extended to support insert, update and delete actions on all parts of a properties text.
 
 Summary operations are provided in: 
 
@@ -88,4 +88,4 @@ size=large
 
 ## XSL Transform
 An XSL transform re-constitutes properties text from SAX events:
- - [Properties file builder](src/main/resources/xslt/properties.xslt)
+ - [Properties text writer](src/main/resources/xslt/properties.xslt)

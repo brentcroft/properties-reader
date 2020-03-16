@@ -3,13 +3,11 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-import javax.xml.transform.TransformerException;
-
 public class MultiEntryScenarios extends AbstractScenarios
 {
 
     @Test
-    public void lf_abc() throws TransformerException
+    public void lf_abc() throws Exception
     {
         runRoundTrip(
 
@@ -24,7 +22,7 @@ public class MultiEntryScenarios extends AbstractScenarios
 
 
     @Test
-    public void abc_def_lf() throws TransformerException
+    public void abc_def_lf() throws Exception
     {
         runRoundTrip(
 
@@ -39,7 +37,7 @@ public class MultiEntryScenarios extends AbstractScenarios
 
 
     @Test
-    public void lf2_xy_yz_za_ab_lf2() throws TransformerException
+    public void lf2_xy_yz_za_ab_lf2() throws Exception
     {
         runRoundTrip(
 

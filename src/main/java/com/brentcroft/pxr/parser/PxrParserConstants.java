@@ -44,6 +44,7 @@ public interface PxrParserConstants {
     "\":\"",
     "<CONT>",
     "<CHAR>",
+    "\"\\\\\"",
   };
 
 }

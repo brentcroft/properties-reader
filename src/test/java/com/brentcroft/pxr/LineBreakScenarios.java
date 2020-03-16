@@ -3,12 +3,10 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-import javax.xml.transform.TransformerException;
-
 public class LineBreakScenarios extends AbstractScenarios
 {
     @Test
-    public void lb_space_5() throws TransformerException
+    public void lb_space_5() throws Exception
     {
         runRoundTrip(
                 "\n       ",
@@ -18,7 +16,7 @@ public class LineBreakScenarios extends AbstractScenarios
     }
 
     @Test
-    public void lb_space() throws TransformerException
+    public void lb_space() throws Exception
     {
         runRoundTrip(
                 "\n ",
@@ -28,7 +26,7 @@ public class LineBreakScenarios extends AbstractScenarios
     }
 
     @Test
-    public void lb() throws TransformerException
+    public void lb() throws Exception
     {
         runRoundTrip(
                 "\n",
@@ -38,7 +36,7 @@ public class LineBreakScenarios extends AbstractScenarios
     }
 
     @Test
-    public void space_lb_space() throws TransformerException
+    public void space_lb_space() throws Exception
     {
         runRoundTrip(
                 " \n ",
@@ -49,7 +47,7 @@ public class LineBreakScenarios extends AbstractScenarios
     }
 
     @Test
-    public void space_5_lb() throws TransformerException
+    public void space_5_lb() throws Exception
     {
         runRoundTrip(
                 "    \n",

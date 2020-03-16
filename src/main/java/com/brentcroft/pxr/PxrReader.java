@@ -25,7 +25,7 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
     private boolean systemIdAttribute = false;
     private boolean entriesOnly = false;
 
-    private String encoding = "UTF-8";
+    private String encoding = "ISO-8859-1";
 
     private PxrProperties pxrProperties;
 
@@ -87,12 +87,12 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
     {
         final ContentHandler contentHandler = getContentHandler();
 
-        final TAG tag = PxrItem.TAG.PROPERTIES;
+        final TAG tag = TAG.PROPERTIES;
         final AttributesImpl atts = new AttributesImpl();
 
         if ( nonNull( pxrProperties.getSystemId() ) )
         {
-            PxrItem.ATTR.SYSTEM_ID.setAttribute( atts, NAMESPACE_URI, pxrProperties.getSystemId() );
+            ATTR.SYSTEM_ID.setAttribute( atts, NAMESPACE_URI, pxrProperties.getSystemId() );
         }
 
         contentHandler.startDocument();
@@ -124,19 +124,19 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
     {
         final ContentHandler contentHandler = getContentHandler();
 
-        final PxrItem.TAG tag = PxrItem.TAG.COMMENT;
+        final TAG tag = TAG.COMMENT;
         final AttributesImpl atts = new AttributesImpl();
 
-        PxrItem.ATTR.KEY.setAttribute( atts, NAMESPACE_URI, comment.getKey() );
+        ATTR.KEY.setAttribute( atts, NAMESPACE_URI, comment.getKey() );
 
         if ( comment.getLinesBefore() > 0 )
         {
-            PxrItem.ATTR.LINES_BEFORE.setAttribute( atts, NAMESPACE_URI, String.valueOf( comment.getLinesBefore() ) );
+            ATTR.LINES_BEFORE.setAttribute( atts, NAMESPACE_URI, String.valueOf( comment.getLinesBefore() ) );
         }
 
         if ( ! comment.isEol() )
         {
-            PxrItem.ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );
+            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );
         }
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );
@@ -160,7 +160,7 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
 
         final ContentHandler contentHandler = getContentHandler();
 
-        final TAG tag = PxrItem.TAG.ENTRY;
+        final TAG tag = TAG.ENTRY;
         final AttributesImpl atts = new AttributesImpl();
 
         ATTR.KEY.setAttribute( atts, NAMESPACE_URI, entry.getKey() );
@@ -211,7 +211,7 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
     private void emitValueAsZerothContinuation( String value ) throws SAXException
     {
         final ContentHandler contentHandler = getContentHandler();
-        final TAG tag = PxrItem.TAG.TEXT;
+        final TAG tag = TAG.TEXT;
         final AttributesImpl atts = new AttributesImpl();
 
         ATTR.KEY.setAttribute( atts, NAMESPACE_URI, "0" );
@@ -234,10 +234,10 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
 
         ATTR.KEY.setAttribute( atts, NAMESPACE_URI, String.valueOf( continuation.getIndex() ) );
 
-        if ( nonNull( continuation.getCont() ) )
-        {
-            ATTR.CONT.setAttribute( atts, NAMESPACE_URI, continuation.getCont() );
-        }
+//        if ( nonNull( continuation.getCont() ) )
+//        {
+//            ATTR.CONT.setAttribute( atts, NAMESPACE_URI, continuation.getCont() );
+//        }
 
         if ( nonNull( continuation.getPrefix() ) )
         {
@@ -246,7 +246,7 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
 
         if ( ! continuation.isEol() )
         {
-            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "false" );
+            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );
         }
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );

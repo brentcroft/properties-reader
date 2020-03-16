@@ -1,16 +1,16 @@
 package com.brentcroft.pxr;
 
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.xml.transform.TransformerException;
+import java.io.IOException;
 
 public class EntryScenarios extends AbstractScenarios
 {
 
     @Test
-    public void single_key() throws TransformerException
+    public void single_key() throws Exception
     {
         runRoundTrip(
 
@@ -23,7 +23,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void single_key_space() throws TransformerException
+    public void single_key_space() throws Exception
     {
         runRoundTrip(
 
@@ -36,7 +36,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void space_single_key() throws TransformerException
+    public void space_single_key() throws Exception
     {
         runRoundTrip(
 
@@ -50,7 +50,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void single_key_space5() throws TransformerException
+    public void single_key_space5() throws Exception
     {
         runRoundTrip(
 
@@ -63,7 +63,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void single_key_value() throws TransformerException
+    public void single_key_value() throws Exception
     {
         runRoundTrip(
 
@@ -76,7 +76,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void single_key_value_fat_sep() throws TransformerException
+    public void single_key_value_fat_sep() throws Exception
     {
         runRoundTrip(
 
@@ -89,7 +89,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void a_b_c() throws TransformerException
+    public void a_b_c() throws Exception
     {
         runRoundTrip(
 
@@ -102,7 +102,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void lf_a_b_c() throws TransformerException
+    public void lf_a_b_c() throws Exception
     {
         runRoundTrip(
 
@@ -116,7 +116,7 @@ public class EntryScenarios extends AbstractScenarios
     }
 
     @Test
-    public void weird_text() throws TransformerException
+    public void weird_text() throws Exception
     {
         runRoundTrip(
 
@@ -124,12 +124,14 @@ public class EntryScenarios extends AbstractScenarios
 
                 "<properties>" +
                         "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
-                        "</properties>"
+                        "</properties>",
+
+                "UTF-8"
         );
     }
 
     @Test
-    public void weird_text_wrong_encoding() throws TransformerException
+    public void weird_text_wrong_encoding() throws Exception
     {
         given()
                 .properties_text( "# the “allow” to" );
@@ -145,5 +147,23 @@ public class EntryScenarios extends AbstractScenarios
                 .transform_xml_to_properties_text();
         then()
                 .different_properties_text();
+    }
+
+    @Test
+    public void large_text() throws IOException, Exception
+    {
+        given()
+                .properties_file( "src/test/resources/test.properties" );
+
+        when()
+                .transform_text_to_xml_text( "UTF-8" );
+
+        then()
+                .xml_text_equals_file( "src/test/resources/test.xml" );
+
+        when()
+                .transform_xml_to_properties_text();
+        then()
+                .same_properties_text();
     }
 }

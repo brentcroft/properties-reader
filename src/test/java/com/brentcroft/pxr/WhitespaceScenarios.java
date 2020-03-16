@@ -3,18 +3,16 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-import javax.xml.transform.TransformerException;
-
 public class WhitespaceScenarios extends AbstractScenarios
 {
     @Test
-    public void empty() throws TransformerException
+    public void empty() throws Exception
     {
         runRoundTrip( "", "<properties/>" );
     }
 
     @Test
-    public void space_one() throws TransformerException
+    public void space_one() throws Exception
     {
         runRoundTrip(
                 " ",
@@ -25,7 +23,7 @@ public class WhitespaceScenarios extends AbstractScenarios
     }
 
     @Test
-    public void space_eight() throws TransformerException
+    public void space_eight() throws Exception
     {
         runRoundTrip(
                 "        ",

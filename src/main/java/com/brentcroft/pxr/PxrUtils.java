@@ -32,8 +32,26 @@ public class PxrUtils
         return ! isNull( o );
     }
 
+    public static String escapeKey( String key )
+    {
+        String eKey = key
+                .replaceAll( " ", "\\\\ " )
+                .replaceAll( ":", "\\\\:" )
+                .replaceAll( "=", "\\\\=" );
 
-    private static void loadRixTemplates() throws TransformerConfigurationException
+        //System.out.println("Escape key: " + key + " -> " + eKey );
+
+        return eKey;
+    }
+
+    public static String escapeValue( String value )
+    {
+        return value
+                .replaceAll( "\n", "\\n" );
+    }
+
+
+    private static void loadPropertiesTemplates() throws TransformerConfigurationException
     {
         PXR_TEMPLATES = TransformerFactory
                 .newInstance()
@@ -50,7 +68,7 @@ public class PxrUtils
     {
         if ( isNull( PXR_TEMPLATES ) )
         {
-            loadRixTemplates();
+            loadPropertiesTemplates();
         }
 
         PXR_TEMPLATES
@@ -134,7 +152,7 @@ public class PxrUtils
     {
         if ( isNull( PXR_TEMPLATES ) )
         {
-            loadRixTemplates();
+            loadPropertiesTemplates();
         }
 
         SAXSource saxSource = new SAXSource(

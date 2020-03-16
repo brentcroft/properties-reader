@@ -5,6 +5,11 @@ import com.tngtech.jgiven.Stage;
 import com.tngtech.jgiven.annotation.As;
 import com.tngtech.jgiven.annotation.ScenarioState;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import static com.brentcroft.pxr.fixtures.GivenProperties.readFile;
 import static com.brentcroft.pxr.fixtures.Utils.canonicalisePropertiesText;
 import static com.brentcroft.pxr.fixtures.Utils.canonicaliseXmlText;
 import static org.junit.Assert.*;
@@ -94,6 +99,24 @@ public class ThenProperties extends Stage< ThenProperties >
 
     public ThenProperties transformer_exception()
     {
+        return self();
+    }
+
+    public ThenProperties transform_result_equals_file( String filename ) throws IOException
+    {
+        String expected = readFile( new FileInputStream( filename ) );
+
+        transform_result_is(expected);
+
+        return self();
+    }
+
+    public ThenProperties xml_text_equals_file( String filename ) throws IOException
+    {
+        String expected = readFile( new FileInputStream( filename ) );
+
+        xml_text_equals(expected);
+
         return self();
     }
 }

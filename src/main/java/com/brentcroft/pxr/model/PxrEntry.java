@@ -28,11 +28,20 @@ public class PxrEntry
             b.append( value );
         }
 
+        if ( eol )
+        {
+            b.append( "\n" );
+        }
+
         if ( nonNull( continuations ) )
         {
             for ( PxrEntryContinuation pec : continuations )
             {
-                b.append( pec.getValue() );
+                if ( nonNull( pec.getValue() ) )
+                {
+                    b.append( pec.getValue() );
+                }
+
                 if ( pec.isEol() )
                 {
                     b.append( "\n" );

@@ -3,15 +3,18 @@ package com.brentcroft.pxr.fixtures;
 import com.tngtech.jgiven.junit.ScenarioTest;
 
 import javax.xml.transform.TransformerException;
+import java.io.UnsupportedEncodingException;
 
 public class AbstractScenarios extends ScenarioTest< GivenProperties, WhenProperties, ThenProperties >
 {
-    protected void runRoundTrip( String propertiesText, String propertiesXml ) throws TransformerException
+    protected void runRoundTrip( String propertiesText, String propertiesXml ) throws TransformerException, UnsupportedEncodingException
     {
-        runRoundTrip( propertiesText, propertiesXml, null );
+        // either seems to produce same result
+        //runRoundTrip( propertiesText, propertiesXml, null );
+        runRoundTrip( propertiesText, propertiesXml, "UTF-8" );
     }
 
-    protected void runRoundTrip( String propertiesText, String propertiesXml, String encoding ) throws TransformerException
+    protected void runRoundTrip( String propertiesText, String propertiesXml, String encoding ) throws TransformerException, UnsupportedEncodingException
     {
         given()
                 .properties_text( propertiesText );

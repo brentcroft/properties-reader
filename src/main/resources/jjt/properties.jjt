@@ -37,8 +37,8 @@ TOKEN :
     | <HASH:  "#" ( <SPACE> )? >
     | <EQUALS:  "=" >
     | <COLON:  ":" >
-    | <CONT:  "\\" ( ~[ "\n", "\r", "\\" ] )* >
-    | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " " ] )+ >
+    | <CONT:  "\\" ( <LF> | <CR> <LF> ) >
+    | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " ", "\\" ] )+ >
 }
 
 PxrProperties parse() :
@@ -60,7 +60,7 @@ PxrProperties parse() :
             (
                 ( eol = eol() )
                 | ( space = space() )
-                | init = initiator() ( LOOKAHEAD(2) text = text() )? ( LOOKAHEAD(2) eol = eol() )?
+                | init = initiator() ( LOOKAHEAD(2) text = comment() )? ( LOOKAHEAD(2) eol = eol() )?
                 | key = key() ( LOOKAHEAD(2) sep = sep() ( LOOKAHEAD(2) text = text() ( pecs = continuations() )? )? )? ( LOOKAHEAD(2) eol = eol() )?
             )
             {
@@ -151,6 +151,7 @@ String text() :
             | t = <COLON>
             | t = <HASH>
             | t = <BANG>
+            | t = "\\"
         )
         { b.append( t.image ); }
     )+
@@ -173,7 +174,7 @@ List<PxrEntryContinuation> continuations() :
         (
             t = <CONT>
             (
-                LOOKAHEAD(2) eol = eol()
+                LOOKAHEAD(2)
                 space = space()
                 ( LOOKAHEAD(2) value = text() )?
             )?
@@ -181,12 +182,23 @@ List<PxrEntryContinuation> continuations() :
                 PxrEntryContinuation pec = new PxrEntryContinuation( );
 
                 pec.setIndex( index++ );
-                pec.setCont( t.image );
-                pec.setPrefix( space );
-                pec.setValue( value );
-                pec.setEol( eol );
+                pec.setCont( "\\" );
+                if ( isNull( space ) && isNull( value ) )
+                {
+                    // e.g.: line continuation is followed by a comment on next line
+                    pec.setEol( false );
+                }
+                else
+                {
+                    pec.setPrefix( space );
+                    pec.setValue( value );
+                    pec.setEol( true );
+                }
 
                 pecs.add( pec );
+
+                space = null;
+                value = null;
             }
         )
     )+
@@ -200,11 +212,20 @@ List<PxrEntryContinuation> continuations() :
 String key() :
 {
     Token t = null;
+    StringBuilder b = new StringBuilder();
 }
 {
-    t = <CHAR>
+    (
+        LOOKAHEAD(2)
+        (
+           t = <CHAR> | "\\" ( t = <SPACE> | t = <EQUALS> | t = <COLON> )
+        )
+        {
+            b.append( t.image );
+        }
+    )+
     {
-        return t.image;
+        return b.toString();
     }
 }
 
@@ -217,8 +238,8 @@ String sep() :
 }
 {
     (
-        LOOKAHEAD(2) ( ( spaceBefore = space() )? t = <EQUALS> ( LOOKAHEAD(2) spaceAfter = space() )? )
-        | LOOKAHEAD(2) ( ( spaceBefore = space() )? t = <COLON> ( LOOKAHEAD(2) spaceAfter = space() )? )
+        LOOKAHEAD(2) ( spaceBefore = space() )? t = <EQUALS> ( LOOKAHEAD(2) spaceAfter = space() )?
+        | LOOKAHEAD(2) ( spaceBefore = space() )? t = <COLON> ( LOOKAHEAD(2) spaceAfter = space() )?
         | ( spaceBefore = space() )
     )
     {
@@ -228,6 +249,30 @@ String sep() :
                 nonNull( t ) ? t.image : "",
                 nonNull( spaceAfter ) ? spaceAfter : ""
         );
+    }
+}
+
+String comment() :
+{
+    StringBuilder b = new StringBuilder( );
+    Token t = null;
+}
+{
+    (
+        LOOKAHEAD(2)
+        (
+            t = <CHAR>
+            | t = <SPACE>
+            | t = <EQUALS>
+            | t = <COLON>
+            | t = <HASH>
+            | t = <BANG>
+            | t = "\\"
+        )
+        { b.append( t.image ); }
+    )+
+    {
+        return b.toString();
     }
 }
 
