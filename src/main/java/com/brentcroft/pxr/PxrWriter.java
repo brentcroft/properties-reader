@@ -55,8 +55,8 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     // comments typically occur before their parent entry
     // and so can't be bound until all entries are read
-    private List< PxrComment > forwardComments = new ArrayList< PxrComment >();
-    private List< PxrEntryContinuation > pxrEntryContinuations = new ArrayList< PxrEntryContinuation >();
+    private List<PxrComment> forwardComments = new ArrayList<PxrComment>();
+    private List<PxrEntryContinuation> pxrEntryContinuations = new ArrayList<PxrEntryContinuation>();
     private StringBuilder entryText = new StringBuilder();
     private StringBuilder continuationText = new StringBuilder();
     private String tag;
@@ -128,7 +128,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         {
             tag = qName;
 
-            if (!TAG.TEXT.isTag( qName ))
+            if ( !TAG.TEXT.isTag( qName ) )
             {
                 entryKey = ATTR.KEY.getAttribute( attributes );
             }
@@ -190,7 +190,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     private void processUpdate( String tag, String key )
     {
-        if ( ! isUpdatableTag( tag ) )
+        if ( !isUpdatableTag( tag ) )
         {
             return;
         }
@@ -203,7 +203,12 @@ public class PxrWriter extends DefaultHandler implements PxrItem
             pec.setPrefix( prefix );
             pec.setEol( eol );
 
-            pec.setValue( continuationText.toString() );
+            pec.setValue( nonNull( contextValueMapper )
+                          ? contextValueMapper
+                                  .inContext()
+                                  .put( "$index", pec.getIndex() )
+                                  .map( key, continuationText.toString() )
+                          : continuationText.toString() );
             continuationText.setLength( 0 );
 
             pxrEntryContinuations.add( pec );
@@ -218,7 +223,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
         entryForUpdate = pxrProperties.getEntryMap().get( key );
 
-        final String actual = getActualValue( key );
+        final String actualValue = getActualValue( key );
 
         ACT action = TAG.DELETE_ENTRY.isTag( tag ) || TAG.DELETE_COMMENT.isTag( tag )
                      ? ACT.DELETE
@@ -226,22 +231,24 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                        ? ACT.UPDATE
                        : ACT.INSERT;
 
+        final String newValue = mapKeyValue( key, getNewValue(), actualValue );
+
         switch ( action )
         {
             case INSERT:
 
-                insertAtKey( tag, key );
+                insertAtKey( tag, key, newValue );
                 break;
 
             case UPDATE:
 
-                checkExpected( action, key, expected, actual );
-                updateAtKey( tag, key );
+                checkExpected( action, key, expected, actualValue );
+                updateAtKey( tag, key, newValue, actualValue );
                 break;
 
             case DELETE:
 
-                checkExpected( action, key, expected, actual );
+                checkExpected( action, key, expected, actualValue );
                 deleteAtKey( tag, key );
                 break;
         }
@@ -290,25 +297,25 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         return pxrEntry.getText();
     }
 
-    private void setEntryText( PxrEntry entry )
+    private void setEntryText( PxrEntry entry, String newValue )
     {
         // overwriting any previous text contributors
         if ( nonNull( pxrEntryContinuations ) && pxrEntryContinuations.size() > 0 )
         {
             entry.setValue( null );
-            entry.setContinuations( new ArrayList< PxrEntryContinuation >( pxrEntryContinuations ) );
+            entry.setContinuations( new ArrayList<PxrEntryContinuation>( pxrEntryContinuations ) );
         }
         else
         {
             entry.setContinuations( null );
-            entry.setValue( entryText.toString() );
+            entry.setValue( newValue );
         }
 
         entryText.setLength( 0 );
         pxrEntryContinuations.clear();
     }
 
-    private void insertAtKey( String tag, String key )
+    private void insertAtKey( String tag, String key, String newValue )
     {
         if ( TAG.ENTRY.isTag( tag ) )
         {
@@ -335,7 +342,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
             entry.setSep( sep );
             entry.setEol( eol );
 
-            setEntryText( entry );
+            setEntryText( entry, newValue );
 
             pxrProperties.append( entry );
         }
@@ -347,11 +354,10 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                 comment.setLinesBefore( linesBefore );
                 comment.setKey( HEADER_KEY );
 
-                String newValue = entryText.toString();
                 entryText.setLength( 0 );
 
                 // ensure header creates two line breaks
-                if ( ! newValue.endsWith( "\n" ) )
+                if ( !newValue.endsWith( "\n" ) )
                 {
                     newValue += "\n";
                 }
@@ -367,12 +373,11 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                 comment.setLinesBefore( linesBefore );
                 comment.setKey( FOOTER_KEY );
 
-                if ( ! pxrProperties.endsWithEol() )
+                if ( !pxrProperties.endsWithEol() )
                 {
                     pxrProperties.appendEol();
                 }
 
-                String newValue = entryText.toString();
                 entryText.setLength( 0 );
 
                 comment.ingest( null, null, newValue, eol );
@@ -386,7 +391,6 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                 comment.setLinesBefore( linesBefore );
                 comment.setKey( key );
 
-                String newValue = entryText.toString();
                 entryText.setLength( 0 );
 
                 comment.ingest( null, null, newValue, eol );
@@ -397,13 +401,21 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     }
 
 
-    private void updateAtKey( String tag, String key )
+    private String mapKeyValue( String key, String newValue, String oldValue )
     {
-        final String actual = getActualValue( key );
-        final String newValue = getNewValue();
+        return nonNull( contextValueMapper )
+               ? contextValueMapper
+                       .inContext()
+                       .put( "$value", oldValue )
+                       .map( key, newValue )
+               : newValue;
+    }
 
+
+    private void updateAtKey( String tag, String key, String newValue, String oldValue )
+    {
         // ignore if no change
-        if ( ! newValue.equals( actual ) )
+        if ( !newValue.equals( oldValue ) )
         {
             if ( TAG.ENTRY.isTag( tag ) )
             {
@@ -416,13 +428,13 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                     entry.setSep( sep );
                     entry.setEol( eol );
 
-                    setEntryText( entry );
+                    setEntryText( entry, newValue );
 
                     pxrProperties.append( entry );
                 }
                 else
                 {
-                    setEntryText( entryForUpdate );
+                    setEntryText( entryForUpdate, newValue );
                 }
             }
             else if ( TAG.COMMENT.isTag( tag ) )
@@ -471,7 +483,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     public static void checkExpected( ACT action, String key, String expected, String actual )
     {
-        if ( expected != null && ! expected.equals( actual ) )
+        if ( expected != null && !expected.equals( actual ) )
         {
             throw new ACTException( action, key, expected, actual );
         }
