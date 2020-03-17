@@ -60,7 +60,7 @@ PxrProperties parse() :
             (
                 ( eol = eol() )
                 | ( space = space() )
-                | init = initiator() ( LOOKAHEAD(2) text = comment() )? ( LOOKAHEAD(2) eol = eol() )?
+                | init = initiator() ( LOOKAHEAD(2) text = text() )? ( LOOKAHEAD(2) eol = eol() )?
                 | key = key() ( LOOKAHEAD(2) sep = sep() ( LOOKAHEAD(2) text = text() ( pecs = continuations() )? )? )? ( LOOKAHEAD(2) eol = eol() )?
             )
             {
@@ -134,7 +134,6 @@ String initiator() :
         return t.image;
     }
 }
-
 
 String text() :
 {
@@ -218,7 +217,7 @@ String key() :
     (
         LOOKAHEAD(2)
         (
-           t = <CHAR> | "\\" ( t = <SPACE> | t = <EQUALS> | t = <COLON> )
+           t = <CHAR> | "\\" ( t = <SPACE> | t = <EQUALS> | t = <COLON> | t = <CHAR> )
         )
         {
             b.append( t.image );
@@ -251,31 +250,6 @@ String sep() :
         );
     }
 }
-
-String comment() :
-{
-    StringBuilder b = new StringBuilder( );
-    Token t = null;
-}
-{
-    (
-        LOOKAHEAD(2)
-        (
-            t = <CHAR>
-            | t = <SPACE>
-            | t = <EQUALS>
-            | t = <COLON>
-            | t = <HASH>
-            | t = <BANG>
-            | t = "\\"
-        )
-        { b.append( t.image ); }
-    )+
-    {
-        return b.toString();
-    }
-}
-
 
 
 String space() :
