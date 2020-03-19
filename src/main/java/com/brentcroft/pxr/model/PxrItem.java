@@ -46,7 +46,6 @@ public interface PxrItem
     }
 
 
-
     enum TAG
     {
         PROPERTIES( "properties" ),
@@ -88,7 +87,7 @@ public interface PxrItem
         SEP( "sep" ),
         INDEX( "index" ),
         SRC( "src" ),
-        TRUNCATED("truncated"),
+        TRUNCATED( "truncated" ),
         EXPECTED( format( "%s:_text", EXPECTED_NAMESPACE_PREFIX ) ),
         ;
 

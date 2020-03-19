@@ -2,7 +2,7 @@ package com.brentcroft.pxr;
 
 /**
  * A ContextValueMapper allows property values to be mapped to new values with respect to a context.
- *
+ * <p>
  * For example, a value may be an EL expression be evaluated, or a key whose value must be hidden.
  */
 public interface ContextValueMapper
@@ -10,7 +10,7 @@ public interface ContextValueMapper
     /**
      * Given a key and value, return a new value
      *
-     * @param key a key
+     * @param key   a key
      * @param value a value
      * @return a new value
      */
@@ -19,7 +19,7 @@ public interface ContextValueMapper
     /**
      * Add an object to the context.
      *
-     * @param key the key to access the object
+     * @param key   the key to access the object
      * @param value the object
      * @return the ContextValueMapper itself, allowing chained calls
      */

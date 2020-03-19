@@ -122,7 +122,6 @@ public class PxrUtils
     }
 
 
-
     public static void pxrPropertiesToXml( PxrProperties pxrProperties, Writer writer ) throws TransformerException
     {
         Transformer transformer = SAXTransformerFactory

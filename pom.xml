@@ -7,7 +7,7 @@
     <groupId>com.brentcroft.pxr</groupId>
     <artifactId>pxr</artifactId>
     <packaging>jar</packaging>
-    <version>00.01.01</version>
+    <version>00.01.02</version>
     <name>Properties XML Reader</name>
     <!--
 

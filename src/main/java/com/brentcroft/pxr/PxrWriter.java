@@ -55,8 +55,8 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     // comments typically occur before their parent entry
     // and so can't be bound until all entries are read
-    private List<PxrComment> forwardComments = new ArrayList<PxrComment>();
-    private List<PxrEntryContinuation> pxrEntryContinuations = new ArrayList<PxrEntryContinuation>();
+    private List< PxrComment > forwardComments = new ArrayList< PxrComment >();
+    private List< PxrEntryContinuation > pxrEntryContinuations = new ArrayList< PxrEntryContinuation >();
     private StringBuilder entryText = new StringBuilder();
     private StringBuilder continuationText = new StringBuilder();
     private String tag;
@@ -128,7 +128,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         {
             tag = qName;
 
-            if ( !TAG.TEXT.isTag( qName ) )
+            if ( ! TAG.TEXT.isTag( qName ) )
             {
                 entryKey = ATTR.KEY.getAttribute( attributes );
             }
@@ -190,7 +190,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     private void processUpdate( String tag, String key )
     {
-        if ( !isUpdatableTag( tag ) )
+        if ( ! isUpdatableTag( tag ) )
         {
             return;
         }
@@ -303,7 +303,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
         if ( nonNull( pxrEntryContinuations ) && pxrEntryContinuations.size() > 0 )
         {
             entry.setValue( null );
-            entry.setContinuations( new ArrayList<PxrEntryContinuation>( pxrEntryContinuations ) );
+            entry.setContinuations( new ArrayList< PxrEntryContinuation >( pxrEntryContinuations ) );
         }
         else
         {
@@ -357,7 +357,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                 entryText.setLength( 0 );
 
                 // ensure header creates two line breaks
-                if ( !newValue.endsWith( "\n" ) )
+                if ( ! newValue.endsWith( "\n" ) )
                 {
                     newValue += "\n";
                 }
@@ -373,7 +373,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                 comment.setLinesBefore( linesBefore );
                 comment.setKey( FOOTER_KEY );
 
-                if ( !pxrProperties.endsWithEol() )
+                if ( ! pxrProperties.endsWithEol() )
                 {
                     pxrProperties.appendEol();
                 }
@@ -415,7 +415,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     private void updateAtKey( String tag, String key, String newValue, String oldValue )
     {
         // ignore if no change
-        if ( !newValue.equals( oldValue ) )
+        if ( ! newValue.equals( oldValue ) )
         {
             if ( TAG.ENTRY.isTag( tag ) )
             {
@@ -483,7 +483,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     public static void checkExpected( ACT action, String key, String expected, String actual )
     {
-        if ( expected != null && !expected.equals( actual ) )
+        if ( expected != null && ! expected.equals( actual ) )
         {
             throw new ACTException( action, key, expected, actual );
         }
