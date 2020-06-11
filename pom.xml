@@ -11,6 +11,13 @@
 
     <name>Properties XML Reader</name>
 
+    <description>
+        Round trip java properties files
+        to an extended XML format,
+        including comments,
+        retaining 100% fidelity.
+    </description>
+
     <url>http://github.com/brentcroft/properties-reader</url>
 
     <licenses>
