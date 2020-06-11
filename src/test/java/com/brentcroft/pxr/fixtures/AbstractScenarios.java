@@ -7,19 +7,12 @@ import java.io.UnsupportedEncodingException;
 
 public class AbstractScenarios extends ScenarioTest< GivenProperties, WhenProperties, ThenProperties >
 {
-    protected void runRoundTrip( String propertiesText, String propertiesXml ) throws TransformerException, UnsupportedEncodingException
-    {
-        // either seems to produce same result
-        //runRoundTrip( propertiesText, propertiesXml, null );
-        runRoundTrip( propertiesText, propertiesXml, "UTF-8" );
-    }
-
-    protected void runRoundTrip( String propertiesText, String propertiesXml, String encoding ) throws TransformerException, UnsupportedEncodingException
+    protected void runRoundTrip( String propertiesText, String propertiesXml  ) throws TransformerException, UnsupportedEncodingException
     {
         given()
                 .properties_text( propertiesText );
         when()
-                .transform_text_to_xml_text( encoding );
+                .transform_text_to_xml_text( );
         then()
                 .xml_text_equals( propertiesXml );
         when()
