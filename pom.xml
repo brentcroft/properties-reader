@@ -37,9 +37,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git:https://github.com/brentcroft/jstl-templates.git</connection>
-        <developerConnection>scm:git:ssh:https://github.com/brentcroft/jstl-templates.git</developerConnection>
-        <url>http://github.com/brentcroft/jstl-templates</url>
+        <connection>scm:git:git:https://github.com/brentcroft/properties-reader.git</connection>
+        <developerConnection>scm:git:ssh:https://github.com/brentcroft/properties-reader.git</developerConnection>
+        <url>http://github.com/brentcroft/properties-reader</url>
     </scm>
 
     <!--
