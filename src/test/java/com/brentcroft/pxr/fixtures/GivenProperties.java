@@ -36,9 +36,9 @@ public class GivenProperties extends Stage<GivenProperties>
     }
 
     @As("properties file: \n[$]\n")
-    public GivenProperties properties_file( String filename ) throws IOException
+    public GivenProperties properties_file( String filename  ) throws IOException
     {
-        this.propertiesText = readFile( new FileInputStream( filename ) );
+        this.propertiesText = readFile( new FileInputStream( filename ), "ISO_8859_1" );
 
         return self();
     }
@@ -53,9 +53,9 @@ public class GivenProperties extends Stage<GivenProperties>
     }
 
 
-    public static String readFile( InputStream inputStream ) throws IOException
+    public static String readFile( InputStream inputStream, String charset )
     {
-        Scanner scanner = new Scanner( inputStream );
+        Scanner scanner = new Scanner( inputStream, charset );
 
         try
         {

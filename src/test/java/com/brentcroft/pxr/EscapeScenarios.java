@@ -13,7 +13,7 @@ public class EscapeScenarios extends AbstractScenarios
                 .properties_text( "a\\qb=c\n" );
 
         when()
-                .transform_text_to_xml_text( "UTF-8" );
+                .transform_text_to_xml_text( );
 
         then()
                 .xml_text_equals( "<properties>\n" +
@@ -27,7 +27,7 @@ public class EscapeScenarios extends AbstractScenarios
                 .transform_result_is( "aqb=c\n" );
 
         when()
-                .transform_text_to_xml_text( "UTF-8" );
+                .transform_text_to_xml_text(  );
 
         then()
                 .xml_text_equals( "<properties>\n" +
@@ -42,7 +42,7 @@ public class EscapeScenarios extends AbstractScenarios
                 .properties_text( "a\\/b=c\n" );
 
         when()
-                .transform_text_to_xml_text( "UTF-8" );
+                .transform_text_to_xml_text( );
 
         then()
                 .xml_text_equals( "<properties>\n" +
@@ -56,7 +56,7 @@ public class EscapeScenarios extends AbstractScenarios
                 .transform_result_is( "a/b=c\n" );
 
         when()
-                .transform_text_to_xml_text( "UTF-8" );
+                .transform_text_to_xml_text(  );
 
         then()
                 .xml_text_equals( "<properties>\n" +

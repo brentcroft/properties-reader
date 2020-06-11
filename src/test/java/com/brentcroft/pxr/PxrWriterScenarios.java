@@ -6,13 +6,15 @@ import org.junit.Test;
 
 import javax.xml.transform.TransformerException;
 
+import java.io.UnsupportedEncodingException;
+
 import static com.brentcroft.pxr.fixtures.Utils.EPILOG;
 import static com.brentcroft.pxr.fixtures.Utils.PROLOG;
 
 public class PxrWriterScenarios extends AbstractScenarios
 {
     @Test
-    public void round_trip() throws TransformerException, ParseException
+    public void round_trip() throws TransformerException, ParseException, UnsupportedEncodingException
     {
         given()
                 .properties_text( "" +

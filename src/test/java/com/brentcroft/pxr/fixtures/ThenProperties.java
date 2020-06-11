@@ -6,7 +6,6 @@ import com.tngtech.jgiven.annotation.As;
 import com.tngtech.jgiven.annotation.ScenarioState;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static com.brentcroft.pxr.fixtures.GivenProperties.readFile;
@@ -58,6 +57,7 @@ public class ThenProperties extends Stage< ThenProperties >
 
         return self();
     }
+
     public ThenProperties same_properties_text()
     {
         assertEquals(
@@ -104,18 +104,22 @@ public class ThenProperties extends Stage< ThenProperties >
 
     public ThenProperties transform_result_equals_file( String filename ) throws IOException
     {
-        String expected = readFile( new FileInputStream( filename ) );
+        String expected = readFile(
+                new FileInputStream( filename ),
+                "UTF-8" );
 
-        transform_result_is(expected);
+        transform_result_is( expected );
 
         return self();
     }
 
     public ThenProperties xml_text_equals_file( String filename ) throws IOException
     {
-        String expected = readFile( new FileInputStream( filename ) );
+        String expected = readFile(
+                new FileInputStream( filename ),
+                "UTF-8" );
 
-        xml_text_equals(expected);
+        xml_text_equals( expected );
 
         return self();
     }

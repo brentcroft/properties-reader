@@ -3,9 +3,6 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-
 public class EntryScenarios extends AbstractScenarios
 {
 
@@ -116,7 +113,6 @@ public class EntryScenarios extends AbstractScenarios
     }
 
 
-
     @Test
     public void weird_text() throws Exception
     {
@@ -126,42 +122,59 @@ public class EntryScenarios extends AbstractScenarios
 
                 "<properties>" +
                         "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
-                        "</properties>",
-
-                "UTF-8"
+                        "</properties>"
         );
     }
 
     @Test
-    public void weird_text_wrong_encoding() throws Exception
+    public void back_quotes() throws Exception
     {
         given()
                 .properties_text( "# the “allow” to" );
 
         when()
-                .transform_text_to_xml_text( "ISO-8859-1" );
+                .transform_text_to_xml_text();
 
         then()
-                .xml_text_not_equals( "<properties>" +
+                .xml_text_equals( "<properties>" +
                         "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
                         "</properties>" );
         when()
                 .transform_xml_to_properties_text();
         then()
-                .different_properties_text();
+                .same_properties_text();
     }
 
     @Test
-    public void large_text() throws IOException, Exception
+    public void large_text() throws Exception
     {
         given()
                 .properties_file( "src/test/resources/test.properties" );
 
         when()
-                .transform_text_to_xml_text( "UTF-8" );
+                .transform_text_to_xml_text();
 
         then()
                 .xml_text_equals_file( "src/test/resources/test.xml" );
+
+        when()
+                .transform_xml_to_properties_text();
+        then()
+                .same_properties_text();
+    }
+
+
+    @Test
+    public void charset_quotes() throws Exception
+    {
+        given()
+                .properties_file( "src/test/resources/charset2-test.properties" );
+
+        when()
+                .transform_text_to_xml_text();
+
+        then()
+                .xml_text_equals_file( "src/test/resources/charset-test.xml" );
 
         when()
                 .transform_xml_to_properties_text();

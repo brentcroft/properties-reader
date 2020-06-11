@@ -55,10 +55,10 @@ public class PxrWriter extends DefaultHandler implements PxrItem
 
     // comments typically occur before their parent entry
     // and so can't be bound until all entries are read
-    private List< PxrComment > forwardComments = new ArrayList< PxrComment >();
-    private List< PxrEntryContinuation > pxrEntryContinuations = new ArrayList< PxrEntryContinuation >();
-    private StringBuilder entryText = new StringBuilder();
-    private StringBuilder continuationText = new StringBuilder();
+    private final List< PxrComment > forwardComments = new ArrayList< PxrComment >();
+    private final List< PxrEntryContinuation > pxrEntryContinuations = new ArrayList< PxrEntryContinuation >();
+    private final StringBuilder entryText = new StringBuilder();
+    private final StringBuilder continuationText = new StringBuilder();
     private String tag;
     private String sep;
     private String cont;
@@ -300,7 +300,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
     private void setEntryText( PxrEntry entry, String newValue )
     {
         // overwriting any previous text contributors
-        if ( nonNull( pxrEntryContinuations ) && pxrEntryContinuations.size() > 0 )
+        if ( pxrEntryContinuations.size() > 0 )
         {
             entry.setValue( null );
             entry.setContinuations( new ArrayList< PxrEntryContinuation >( pxrEntryContinuations ) );

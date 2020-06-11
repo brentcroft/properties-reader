@@ -21,6 +21,9 @@ import static com.brentcroft.pxr.PxrUtils.*;
 
 public class WhenProperties extends Stage< WhenProperties >
 {
+    String charset = "UTF-8";
+
+
     @ScenarioState
     String propertiesText;
 
@@ -37,14 +40,14 @@ public class WhenProperties extends Stage< WhenProperties >
     PxrProperties pxrProperties;
 
 
-    public WhenProperties transform_text_to_xml_text( String encoding ) throws TransformerException, UnsupportedEncodingException
+    public WhenProperties transform_text_to_xml_text() throws TransformerException, UnsupportedEncodingException
     {
         StringWriter baos = new StringWriter();
 
         propertiesTextToXmlText(
-                new ByteArrayInputStream( propertiesText.getBytes( encoding ) ),
+                new ByteArrayInputStream( propertiesText.getBytes( charset ) ),
                 baos,
-                encoding
+                charset
         );
 
         propertiesXml = baos.toString();
@@ -52,12 +55,12 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties transform_xml_to_properties_text() throws TransformerException
+    public WhenProperties transform_xml_to_properties_text() throws TransformerException, UnsupportedEncodingException
     {
         StringWriter baos = new StringWriter();
 
         xmlTextToPropertiesText(
-                new ByteArrayInputStream( propertiesXml.getBytes() ),
+                new ByteArrayInputStream( propertiesXml.getBytes( charset ) ),
                 baos
         );
 
@@ -66,9 +69,10 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties parse_text_to_pxr_properties() throws ParseException
+    public WhenProperties parse_text_to_pxr_properties() throws ParseException, UnsupportedEncodingException
     {
-        pxrProperties = getPxrProperties( new ByteArrayInputStream( propertiesText.getBytes() ) );
+        pxrProperties = getPxrProperties(
+                new ByteArrayInputStream( propertiesText.getBytes( charset ) ) );
 
         return self();
     }
@@ -104,7 +108,7 @@ public class WhenProperties extends Stage< WhenProperties >
                 .newInstance()
                 .newSAXParser()
                 .parse(
-                        new ByteArrayInputStream( propertiesXml.getBytes() ),
+                        new ByteArrayInputStream( propertiesXml.getBytes( charset ) ),
                         pxrWriter
                 );
 
