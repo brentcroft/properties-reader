@@ -1,4 +1,6 @@
 # properties-reader
+[![Maven Central](https://img.shields.io/maven-central/v/com.brentcroft.tools/pxr.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.brentcroft.tools%22%20AND%20a:%22pxr%22)
+
 JavaCC grammar and kit to generate SAX events describing a java properties file, and an XSL transform to regenerate the original file.
 
 Java 1.5+
