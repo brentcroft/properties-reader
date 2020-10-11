@@ -45,9 +45,9 @@ public class WhenProperties extends Stage< WhenProperties >
         StringWriter baos = new StringWriter();
 
         propertiesTextToXmlText(
-                new ByteArrayInputStream( propertiesText.getBytes( charset ) ),
+                new ByteArrayInputStream( propertiesText.getBytes( "ISO-8859-1" ) ),
                 baos,
-                charset
+                "UTF-8"
         );
 
         propertiesXml = baos.toString();
@@ -60,7 +60,7 @@ public class WhenProperties extends Stage< WhenProperties >
         StringWriter baos = new StringWriter();
 
         xmlTextToPropertiesText(
-                new ByteArrayInputStream( propertiesXml.getBytes( charset ) ),
+                new ByteArrayInputStream( propertiesXml.getBytes( "UTF-8" ) ),
                 baos
         );
 

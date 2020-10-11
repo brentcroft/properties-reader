@@ -114,19 +114,6 @@ public class EntryScenarios extends AbstractScenarios
 
 
     @Test
-    public void weird_text() throws Exception
-    {
-        runRoundTrip(
-
-                "# the “allow” to",
-
-                "<properties>" +
-                        "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
-                        "</properties>"
-        );
-    }
-
-    @Test
     public void back_quotes() throws Exception
     {
         given()
@@ -137,12 +124,12 @@ public class EntryScenarios extends AbstractScenarios
 
         then()
                 .xml_text_equals( "<properties>" +
-                        "    <comment key='_footer' eol='0'><![CDATA[# the “allow” to]]></comment>" +
+                        "    <comment key='_footer' eol='0'><![CDATA[# the ?allow? to]]></comment>" +
                         "</properties>" );
         when()
                 .transform_xml_to_properties_text();
         then()
-                .same_properties_text();
+                .transform_result_is("# the ?allow? to" );
     }
 
     @Test

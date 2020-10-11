@@ -2,9 +2,16 @@
 <xsl:stylesheet
         version="1.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:pxrutils="xalan://com.brentcroft.pxr.PxrUtils">
+        xmlns:pxrutils="xalan://com.brentcroft.pxr.PxrUtils"
+        xmlns:xalan="http://xml.apache.org/xalan">
 
-    <xsl:output method="text" version="1.0" encoding="UTF-8"/>
+    <xsl:output
+            method="text"
+            encoding="ISO-8859-1"
+            xalan:line-separator="&#xa;"/>
+
+    <xsl:variable name="NL"><xsl:text>&#xa;</xsl:text></xsl:variable>
+
 
     <xsl:template match="text()"/>
 
@@ -35,7 +42,7 @@
         </xsl:if>
         <xsl:value-of select="$text"/>
         <xsl:if test="not( @eol = 0 )">
-            <xsl:text>&#10;</xsl:text>
+            <xsl:value-of select="$NL"/>
         </xsl:if>
     </xsl:template>
 
@@ -59,7 +66,7 @@
             </xsl:otherwise>
         </xsl:choose>
         <xsl:if test="not( @eol = 0 )">
-            <xsl:text>&#10;</xsl:text>
+            <xsl:value-of select="$NL"/>
         </xsl:if>
     </xsl:template>
 
@@ -73,7 +80,7 @@
             <xsl:otherwise>
                 <xsl:text>\</xsl:text>
                 <xsl:if test="not( @eol = '0' ) or $value or @prefix">
-                    <xsl:text>&#10;</xsl:text>
+                    <xsl:value-of select="$NL"/>
                 </xsl:if>
                 <xsl:value-of select="@prefix"/>
                 <xsl:value-of select="pxrutils:escapeValue( $value )"/>
@@ -84,7 +91,7 @@
     <xsl:template name="lines-before">
         <xsl:param name="lines" select="0"/>
         <xsl:if test="$lines &gt; 0">
-            <xsl:text>&#10;</xsl:text>
+            <xsl:value-of select="$NL"/>
             <xsl:call-template name="lines-before">
                 <xsl:with-param name="lines" select="$lines - 1"/>
             </xsl:call-template>
