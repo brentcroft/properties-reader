@@ -48,7 +48,7 @@
     <properties>
         <javacc.version>7.0.5</javacc.version>
         <!-- -->
-        <junit.version>RELEASE</junit.version>
+        <junit.version>4.13.1</junit.version>
         <jgiven.version>0.18.2</jgiven.version>
         <lombok.version>RELEASE</lombok.version>
         <!-- -->
