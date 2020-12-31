@@ -32,13 +32,13 @@ TOKEN :
 {
     <LF: "\n">
     | <CR: "\r">
-    | <SPACE:  ( " " )+ >
+    | <SPACE:  ( " " | "\t" )+ >
     | <BANG:  "!" ( <SPACE> )? >
     | <HASH:  "#" ( <SPACE> )? >
     | <EQUALS:  "=" >
     | <COLON:  ":" >
     | <CONT:  "\\" ( <LF> | <CR> <LF> ) >
-    | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " ", "\\" ] )+ >
+    | <CHAR: ( ~[ "\n", "\r", "!", "#", "=", ":", " ", "\t", "\\" ] )+ >
 }
 
 PxrProperties parse() :

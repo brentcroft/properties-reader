@@ -95,11 +95,17 @@ private int jjMoveNfa_0(int startState, int curPos)
                   }
                   break;
                case 1:
-                  if ((0xdbfffff4ffffdbffL & l) != 0L)
+                  if ((0xdbfffff4ffffd9ffL & l) != 0L)
                   {
                      if (kind > 9)
                         kind = 9;
                      { jjCheckNAdd(8); }
+                  }
+                  else if ((0x100000200L & l) != 0L)
+                  {
+                     if (kind > 3)
+                        kind = 3;
+                     { jjCheckNAdd(0); }
                   }
                   else if (curChar == 35)
                   {
@@ -113,22 +119,16 @@ private int jjMoveNfa_0(int startState, int curPos)
                         kind = 4;
                      { jjCheckNAdd(2); }
                   }
-                  else if (curChar == 32)
-                  {
-                     if (kind > 3)
-                        kind = 3;
-                     { jjCheckNAdd(0); }
-                  }
                   break;
                case 0:
-                  if (curChar != 32)
+                  if ((0x100000200L & l) == 0L)
                      break;
                   if (kind > 3)
                      kind = 3;
                   { jjCheckNAdd(0); }
                   break;
                case 2:
-                  if (curChar != 32)
+                  if ((0x100000200L & l) == 0L)
                      break;
                   if (kind > 4)
                      kind = 4;
@@ -141,7 +141,7 @@ private int jjMoveNfa_0(int startState, int curPos)
                   { jjCheckNAdd(4); }
                   break;
                case 4:
-                  if (curChar != 32)
+                  if ((0x100000200L & l) == 0L)
                      break;
                   if (kind > 5)
                      kind = 5;
@@ -152,7 +152,7 @@ private int jjMoveNfa_0(int startState, int curPos)
                      kind = 8;
                   break;
                case 8:
-                  if ((0xdbfffff4ffffdbffL & l) == 0L)
+                  if ((0xdbfffff4ffffd9ffL & l) == 0L)
                      break;
                   kind = 9;
                   { jjCheckNAdd(8); }

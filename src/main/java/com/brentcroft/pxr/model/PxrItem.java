@@ -88,7 +88,7 @@ public interface PxrItem
         INDEX( "index" ),
         SRC( "src" ),
         TRUNCATED( "truncated" ),
-        EXPECTED( format( "%s:_text", EXPECTED_NAMESPACE_PREFIX ) ),
+        EXPECTED_TEXT( format( "%s:_text", EXPECTED_NAMESPACE_PREFIX ) ),
         ;
 
         private final String attr;

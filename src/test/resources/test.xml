@@ -37,7 +37,7 @@
         <![CDATA[# Unicode]]>
     </comment>
     <entry key="tab" index="7" sep=" : ">\u0009</entry>
-    <comment key="path">
+    <comment key="path" lines-before="1">
         <![CDATA[# If you want your property to include a backslash, it should be escaped by another backslash]]>
     </comment>
     <entry key="path" index="8">c:\\wiki\\templates</entry>

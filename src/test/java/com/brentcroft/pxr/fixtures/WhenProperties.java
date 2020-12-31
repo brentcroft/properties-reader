@@ -1,5 +1,6 @@
 package com.brentcroft.pxr.fixtures;
 
+import com.brentcroft.pxr.CRFilterWriter;
 import com.brentcroft.pxr.PxrUtils;
 import com.brentcroft.pxr.PxrWriter;
 import com.brentcroft.pxr.model.PxrProperties;
@@ -12,10 +13,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.TransformerException;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 import static com.brentcroft.pxr.PxrUtils.*;
 
@@ -57,7 +55,7 @@ public class WhenProperties extends Stage< WhenProperties >
 
     public WhenProperties transform_xml_to_properties_text() throws TransformerException, UnsupportedEncodingException
     {
-        StringWriter baos = new StringWriter();
+        Writer baos = CRFilterWriter.from(new StringWriter());
 
         xmlTextToPropertiesText(
                 new ByteArrayInputStream( propertiesXml.getBytes( "UTF-8" ) ),
@@ -79,7 +77,7 @@ public class WhenProperties extends Stage< WhenProperties >
 
     public WhenProperties transform_pxr_to_properties_text() throws TransformerException
     {
-        StringWriter baos = new StringWriter();
+        Writer baos = CRFilterWriter.from(  new StringWriter() );
 
         PxrUtils.pxrPropertiesToText( pxrProperties, baos );
 

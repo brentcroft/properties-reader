@@ -133,7 +133,7 @@ public class PxrWriter extends DefaultHandler implements PxrItem
                 entryKey = ATTR.KEY.getAttribute( attributes );
             }
 
-            expected = ATTR.EXPECTED.getAttribute( attributes );
+            expected = ATTR.EXPECTED_TEXT.getAttribute( attributes );
 
             String linesBeforeText = ATTR.LINES_BEFORE.getAttribute( attributes );
 

@@ -8,9 +8,10 @@
     <xsl:output
             method="text"
             encoding="ISO-8859-1"
+
             xalan:line-separator="&#xa;"/>
 
-    <xsl:variable name="NL"><xsl:text>&#xa;</xsl:text></xsl:variable>
+    <xsl:variable name="NL"><xsl:text>&#10;</xsl:text></xsl:variable>
 
 
     <xsl:template match="text()"/>

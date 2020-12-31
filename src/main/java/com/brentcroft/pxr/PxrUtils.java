@@ -12,7 +12,6 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.Writer;
 
 public class PxrUtils
@@ -20,7 +19,6 @@ public class PxrUtils
     private static final String pxrTemplatesUri = "xslt/properties.xslt";
 
     private static Templates PXR_TEMPLATES;
-
 
     public static boolean isNull( Object o )
     {
@@ -34,14 +32,10 @@ public class PxrUtils
 
     public static String escapeKey( String key )
     {
-        String eKey = key
+        return key
                 .replaceAll( " ", "\\\\ " )
                 .replaceAll( ":", "\\\\:" )
                 .replaceAll( "=", "\\\\=" );
-
-        //System.out.println("Escape key: " + key + " -> " + eKey );
-
-        return eKey;
     }
 
     public static String escapeValue( String value )
@@ -64,7 +58,7 @@ public class PxrUtils
     }
 
 
-    public static void xmlTextToPropertiesText( InputStream inputStream, StringWriter stringWriter ) throws TransformerException
+    public static void xmlTextToPropertiesText( InputStream inputStream, Writer writer ) throws TransformerException
     {
         if ( isNull( PXR_TEMPLATES ) )
         {
@@ -75,7 +69,7 @@ public class PxrUtils
                 .newTransformer()
                 .transform(
                         new StreamSource( inputStream ),
-                        new StreamResult( stringWriter )
+                        new StreamResult( writer )
                 );
     }
 
@@ -154,15 +148,13 @@ public class PxrUtils
             loadPropertiesTemplates();
         }
 
-        SAXSource saxSource = new SAXSource(
-                new PxrReader(),
-                new PxrInputSource( pxrProperties )
-        );
-
         PXR_TEMPLATES
                 .newTransformer()
                 .transform(
-                        saxSource,
+                        new SAXSource(
+                                new PxrReader(),
+                                new PxrInputSource( pxrProperties )
+                        ),
                         new StreamResult( writer )
                 );
     }
