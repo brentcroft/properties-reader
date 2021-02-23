@@ -3,8 +3,10 @@ package com.brentcroft.pxr.model;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.brentcroft.pxr.PxrUtils.nonNull;
+import java.util.Optional;
 
+import static java.lang.String.format;
+import static java.util.Objects.nonNull;
 
 @Getter
 @Setter
@@ -46,7 +48,7 @@ public class PxrComment
         }
     }
 
-    private void maybeAppend( String text )
+    public void maybeAppend( String text )
     {
         if ( nonNull( text ) )
         {
@@ -73,4 +75,22 @@ public class PxrComment
         }
         eol = false;
     }
+
+    public String jsonate()
+    {
+        return format( "{ // comment%n  key: \"%s\"%s%s%s}",
+                key,
+                ( linesBefore > 0 ? format( ",%n  linesBefore: %s", linesBefore ) : "" ),
+                ( eol ? "\n  eol: 1" : "" ),
+                Optional
+                        .of( value )
+                        .map( StringBuilder::toString )
+                        .map( c -> c.replaceAll( "\n", "\\\\n" ) )
+                        .map( c -> format( "value: \"%s\"", c ) )
+                        .map( PxrItem::offset )
+                        .map( c -> ", \n" + c )
+                        .orElse( "" )
+        );
+    }
+
 }

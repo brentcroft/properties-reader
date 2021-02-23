@@ -4,8 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.brentcroft.pxr.PxrUtils.nonNull;
+import static com.brentcroft.pxr.model.PxrItem.offset;
+import static java.lang.String.format;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 
 @Getter
 @Setter
@@ -50,5 +55,33 @@ public class PxrEntry
         }
 
         return b.toString();
+    }
+
+    public String jsonate()
+    {
+        return format( "%s{ // entry %n  key: \"%s\",%n  index: %s%s%s%s%s}",
+                ( isNull( comment ) ? "" : comment.jsonate() + ",\n" ),
+                key,
+                index,
+                ofNullable( sep )
+                        .map( c -> c.replaceAll( "\n", "\\\\n" ) )
+                        .map( c -> format( "sep: \"%s\"", c ) )
+                        .map( PxrItem::offset )
+                        .map( c -> ", \n" + c )
+                        .orElse( "" ),
+                ( eol ? ",\n  eol: 1" : "" ),
+                ofNullable( value )
+                        .map( c -> c.replaceAll( "\n", "\\\\n" ) )
+                        .map( c -> format( "value: \"%s\"", c ) )
+                        .map( PxrItem::offset )
+                        .map( c -> ", \n" + c )
+                        .orElse( "" ),
+                isNull( getContinuations() )
+                ? ""
+                : "[ \n" + offset( getContinuations()
+                        .stream()
+                        .map( PxrEntryContinuation::jsonate )
+                        .collect( Collectors.joining( ", \n" ) ) ) + "\n]"
+        );
     }
 }

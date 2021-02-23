@@ -32,4 +32,16 @@ public class WhitespaceScenarios extends AbstractScenarios
                         "</properties>"
         );
     }
+
+
+    @Test
+    public void tab() throws Exception
+    {
+        runRoundTrip(
+                "\t",
+                "<properties>\n" +
+                        "    <comment key=\"_footer\" eol=\"0\"><![CDATA[\t]]></comment>\n" +
+                        "</properties>"
+        );
+    }
 }

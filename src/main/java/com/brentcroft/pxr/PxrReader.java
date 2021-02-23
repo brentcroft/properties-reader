@@ -12,8 +12,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import static com.brentcroft.pxr.PxrUtils.isNull;
-import static com.brentcroft.pxr.PxrUtils.nonNull;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 /**
  * Parses a Properties Text InputStream into a sequence of SAX Events.
@@ -194,14 +194,16 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
         }
         else
         {
+            int inc = 0;
             if ( nonNull( entry.getValue() ) )
             {
                 emitValueAsZerothContinuation( entry.getValue() );
+                inc++;
             }
 
             for ( PxrEntryContinuation rec : entry.getContinuations() )
             {
-                emitContinuation( rec );
+                emitContinuation( rec, inc );
             }
         }
 
@@ -226,13 +228,13 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
     }
 
 
-    public void emitContinuation( PxrEntryContinuation continuation ) throws SAXException
+    public void emitContinuation( PxrEntryContinuation continuation, int inc ) throws SAXException
     {
         final ContentHandler contentHandler = getContentHandler();
         TAG tag = TAG.TEXT;
         AttributesImpl atts = new AttributesImpl();
 
-        ATTR.KEY.setAttribute( atts, NAMESPACE_URI, String.valueOf( continuation.getIndex() ) );
+        ATTR.KEY.setAttribute( atts, NAMESPACE_URI, String.valueOf( continuation.getIndex() + inc ) );
 
 //        if ( nonNull( continuation.getCont() ) )
 //        {
@@ -246,7 +248,7 @@ public class PxrReader extends AbstractXMLReader implements PxrItem
 
         if ( ! continuation.isEol() )
         {
-            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, "0" );
+            ATTR.EOL.setAttribute( atts, NAMESPACE_URI, continuation.isEol() ? "1" : "0" );
         }
 
         contentHandler.startElement( NAMESPACE_URI, tag.getTag(), tag.getTag(), atts );

@@ -4,8 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.brentcroft.pxr.PxrUtils.nonNull;
+import static java.lang.String.format;
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 
 
 @Getter
@@ -16,8 +19,8 @@ public class PxrProperties implements PxrItem
     private PxrComment header;
     private PxrComment footer;
 
-    private final List< PxrEntry > entries = new ArrayList< PxrEntry >();
-    private final Map< String, PxrEntry > entryMap = new HashMap< String, PxrEntry >();
+    private final List< PxrEntry > entries = new ArrayList<>();
+    private final Map< String, PxrEntry > entryMap = new HashMap<>();
 
     public boolean isEmpty()
     {
@@ -37,8 +40,26 @@ public class PxrProperties implements PxrItem
         }
 
         entries.add( entry );
-        entryMap.put( entry.getKey(), entry );
+
+        if ( nonNull( entry.getKey() ) )
+        {
+            entryMap.put( entry.getKey(), entry );
+        }
     }
+
+//    /**
+//     * Clear and rebuild the entry map.
+//     */
+//    public void purge()
+//    {
+//        entryMap.clear();
+//        entries.forEach( this::remap );
+//    }
+//
+//    public void remap( PxrEntry entry )
+//    {
+//        entryMap.put( entry.getKey(), entry );
+//    }
 
     public void remove( String key )
     {
@@ -91,5 +112,24 @@ public class PxrProperties implements PxrItem
         {
             getEntries().get( getEntries().size() - 1 ).setEol( true );
         }
+    }
+
+    public String jsonate()
+    {
+        return format( "%s%s%s",
+                ofNullable( header )
+                        .map( PxrComment::jsonate )
+                        .map( PxrItem::offset )
+                        .orElse( "" ),
+                "[ \n" + getEntries()
+                        .stream()
+                        .map( PxrEntry::jsonate )
+                        .map( PxrItem::offset )
+                        .collect( Collectors.joining( ", \n" ) ) + "\n]",
+                ofNullable( footer )
+                        .map( PxrComment::jsonate )
+                        .map( PxrItem::offset )
+                        .orElse( "" )
+        );
     }
 }

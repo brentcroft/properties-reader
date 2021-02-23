@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://brentcroft.com/properties"
+        elementFormDefault="qualified">
+    <xs:element name="properties">
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded" minOccurs="0" >
+                <xs:element name="comment" type="commentType" />
+                <xs:element name="entry" type="entryType" />
+            </xs:choice>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="entryType">
+        <xs:complexContent>
+            <xs:extension base="commentType" >
+                <xs:sequence>
+                    <xs:element name="text" type="textType" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="sep" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="commentType">
+        <xs:complexContent>
+            <xs:extension base="commentType" >
+                <xs:attribute name="key" type="xs:attribute" use="required"/>
+                <xs:attribute name="index" type="xs:integer"/>
+                <xs:attribute name="lines-before" type="xs:integer"/>
+                <xs:attribute name="eol" type="xs:integer"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="textType">
+        <xs:complexContent>
+            <xs:extension base="xs:string">
+                <xs:attribute  name="key" type="xs:string" use="required"/>
+                <xs:attribute name="prefix" type="xs:string" />
+                <xs:attribute name="eol" type="xs:integer"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

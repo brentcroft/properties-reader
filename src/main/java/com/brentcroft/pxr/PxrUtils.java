@@ -14,21 +14,14 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.io.Writer;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 public class PxrUtils
 {
     private static final String pxrTemplatesUri = "xslt/properties.xslt";
 
     private static Templates PXR_TEMPLATES;
-
-    public static boolean isNull( Object o )
-    {
-        return o == null;
-    }
-
-    public static boolean nonNull( Object o )
-    {
-        return ! isNull( o );
-    }
 
     public static String escapeKey( String key )
     {
@@ -41,7 +34,7 @@ public class PxrUtils
     public static String escapeValue( String value )
     {
         return value
-                .replaceAll( "\n", "\\n" );
+                .replaceAll( "\n", "\\\\n" );
     }
 
 

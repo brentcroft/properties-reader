@@ -11,39 +11,39 @@ import com.tngtech.jgiven.annotation.ScenarioState;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import static com.brentcroft.pxr.PxrUtils.*;
 
 public class WhenProperties extends Stage< WhenProperties >
 {
-    String charset = "UTF-8";
+    private String charset = "UTF-8";
 
 
     @ScenarioState
-    String propertiesText;
+    private String propertiesText;
 
     @ProvidedScenarioState
-    String propertiesXml;
+    private String propertiesXml;
 
     @ProvidedScenarioState
-    Exception exception;
+    private Exception exception;
 
     @ProvidedScenarioState
-    String transformResult;
+    private String transformResult;
 
     @ProvidedScenarioState
-    PxrProperties pxrProperties;
+    private PxrProperties pxrProperties;
 
 
-    public WhenProperties transform_text_to_xml_text() throws TransformerException, UnsupportedEncodingException
+    public WhenProperties transform_text_to_xml_text() throws TransformerException
     {
         StringWriter baos = new StringWriter();
 
         propertiesTextToXmlText(
-                new ByteArrayInputStream( propertiesText.getBytes( "ISO-8859-1" ) ),
+                new ByteArrayInputStream( propertiesText.getBytes( StandardCharsets.ISO_8859_1 ) ),
                 baos,
                 "UTF-8"
         );
@@ -55,10 +55,10 @@ public class WhenProperties extends Stage< WhenProperties >
 
     public WhenProperties transform_xml_to_properties_text() throws TransformerException, UnsupportedEncodingException
     {
-        Writer baos = CRFilterWriter.from(new StringWriter());
+        Writer baos = CRFilterWriter.from( new StringWriter() );
 
         xmlTextToPropertiesText(
-                new ByteArrayInputStream( propertiesXml.getBytes( "UTF-8" ) ),
+                new ByteArrayInputStream( propertiesXml.getBytes( StandardCharsets.UTF_8 ) ),
                 baos
         );
 
@@ -77,7 +77,7 @@ public class WhenProperties extends Stage< WhenProperties >
 
     public WhenProperties transform_pxr_to_properties_text() throws TransformerException
     {
-        Writer baos = CRFilterWriter.from(  new StringWriter() );
+        Writer baos = CRFilterWriter.from( new StringWriter() );
 
         PxrUtils.pxrPropertiesToText( pxrProperties, baos );
 
@@ -97,23 +97,17 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties update_pxr_properties() throws ParserConfigurationException, SAXException, IOException
+    public WhenProperties update_pxr_properties() throws IOException
     {
         PxrWriter pxrWriter = new PxrWriter();
-        pxrWriter.setPxrProperties( pxrProperties );
 
-        SAXParserFactory
-                .newInstance()
-                .newSAXParser()
-                .parse(
-                        new ByteArrayInputStream( propertiesXml.getBytes( charset ) ),
-                        pxrWriter
-                );
+        pxrWriter.setPxrProperties( pxrProperties );
+        pxrWriter.parse( propertiesXml.getBytes( charset ) );
 
         return self();
     }
 
-    public WhenProperties apply_update() throws ParseException, IOException, SAXException, ParserConfigurationException, TransformerException
+    public WhenProperties apply_update() throws ParseException, IOException, TransformerException
     {
         return self()
                 .parse_text_to_pxr_properties()

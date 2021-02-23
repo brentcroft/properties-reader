@@ -24,9 +24,9 @@ public class Utils
 
     public static String canonicalisePropertiesText( String propertiesText )
     {
-        return propertiesText;
-//        return propertiesText
-//                .replaceAll( "\r", "" );
+//        return propertiesText;
+        return propertiesText
+                .replaceAll( "\r", "" );
     }
 
 }

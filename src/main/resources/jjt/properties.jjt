@@ -9,8 +9,8 @@ options {
 PARSER_BEGIN( PxrParser )
 package com.brentcroft.pxr.parser;
 
-import static com.brentcroft.pxr.PxrUtils.nonNull;
-import static com.brentcroft.pxr.PxrUtils.isNull;
+import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 import com.brentcroft.pxr.model.PxrComment;
 import com.brentcroft.pxr.model.PxrEntry;
@@ -68,6 +68,7 @@ PxrProperties parse() :
                 {
                     if (isNull( comment ))
                     {
+                        // open new footer
                         comment = new PxrComment();
                         comment.setKey( FOOTER_KEY );
                     }
@@ -81,6 +82,7 @@ PxrProperties parse() :
 
                         pxrProperties.setHeader( comment );
 
+                        // open new footer
                         comment = new PxrComment();
                         comment.setKey( FOOTER_KEY );
                     }
@@ -166,7 +168,7 @@ List<PxrEntryContinuation> continuations() :
     String space = null;
     String value = null;
     List<PxrEntryContinuation> pecs = new ArrayList<PxrEntryContinuation>();
-    int index = 1;
+    int index = 0;
 }
 {
     (

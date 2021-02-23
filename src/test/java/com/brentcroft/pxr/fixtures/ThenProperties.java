@@ -16,19 +16,19 @@ import static org.junit.Assert.*;
 public class ThenProperties extends Stage< ThenProperties >
 {
     @ScenarioState
-    String propertiesText;
+    private String propertiesText;
 
     @ScenarioState
-    String propertiesXml;
+    private String propertiesXml;
 
     @ScenarioState
-    Exception exception;
+    private Exception exception;
 
     @ScenarioState
-    String transformResult;
+    private String transformResult;
 
     @ScenarioState
-    PxrProperties pxrProperties;
+    private PxrProperties pxrProperties;
 
 
     public ThenProperties xml_text_is_not_null()

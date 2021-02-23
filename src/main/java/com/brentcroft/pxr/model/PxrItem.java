@@ -1,10 +1,14 @@
 package com.brentcroft.pxr.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
@@ -12,12 +16,14 @@ public interface PxrItem
 {
     String NAMESPACE_URI = "";
     String EXPECTED_NAMESPACE_PREFIX = "act";
-    String EXPECTED_NAMESPACE_URI = "expected";
+    String EXPECTED_NAMESPACE_URI = "remove";
 
     String TAGS_FOR_CATA_TEXT = TAG.COMMENT.getTag();
 
     String HEADER_KEY = "_header";
     String FOOTER_KEY = "_footer";
+
+    String encoding = "UTF-8";
 
 
     enum ACT
@@ -29,19 +35,13 @@ public interface PxrItem
 
 
     @Getter
-    @AllArgsConstructor
-    class ACTException extends RuntimeException
+    class ACTException extends SAXParseException
     {
-        private final ACT action;
-        private final String key;
-        private final String expected;
-        private final String actual;
-
         private static final String MSG_ACTION_FAILED = "DENIED [%s] : expected != actual : key=[%s], expected=[%s], actual=[%s]";
 
-        public String getMessage()
+        public ACTException( ACT action, String key, String expected, String actual, Locator locator )
         {
-            return format( MSG_ACTION_FAILED, action, key, expected, actual );
+            super( format( MSG_ACTION_FAILED, action, key, expected, actual ), locator );
         }
     }
 
@@ -138,5 +138,18 @@ public interface PxrItem
         {
             element.setAttribute( getAttribute(), value );
         }
+    }
+
+    static String offset( String text, String offset )
+    {
+        return Stream
+                .of( text.split( "\\n" ) )
+                .map( t -> offset + t )
+                .collect( Collectors.joining( "\n" ) );
+    }
+
+    static String offset( String text )
+    {
+        return offset( text, "    " );
     }
 }

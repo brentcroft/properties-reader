@@ -12,13 +12,13 @@ import java.util.Scanner;
 public class GivenProperties extends Stage<GivenProperties>
 {
     @ProvidedScenarioState
-    String propertiesText;
+    private String propertiesText;
 
     @ProvidedScenarioState
-    String propertiesXml;
+    private String propertiesXml;
 
     @ScenarioState
-    String transformResult;
+    private String transformResult;
 
     @As("properties text: \n[$]\n")
     public GivenProperties properties_text( String propertiesText )

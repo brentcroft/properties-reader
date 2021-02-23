@@ -42,7 +42,7 @@
             <xsl:text>#</xsl:text>
         </xsl:if>
         <xsl:value-of select="$text"/>
-        <xsl:if test="not( @eol = 0 )">
+        <xsl:if test="not( @eol = '0' )">
             <xsl:value-of select="$NL"/>
         </xsl:if>
     </xsl:template>
@@ -60,13 +60,15 @@
         </xsl:choose>
         <xsl:choose>
             <xsl:when test="text">
-                <xsl:apply-templates select="text"/>
+                <xsl:apply-templates select="text">
+                    <xsl:sort select="@key" data-type="number"/>
+                </xsl:apply-templates>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="pxrutils:escapeValue( text() )"/>
             </xsl:otherwise>
         </xsl:choose>
-        <xsl:if test="not( @eol = 0 )">
+        <xsl:if test="not( @eol = '0' )">
             <xsl:value-of select="$NL"/>
         </xsl:if>
     </xsl:template>
@@ -74,7 +76,7 @@
     <xsl:template match="text">
         <xsl:variable name="value" select="text()"/>
         <xsl:choose>
-            <xsl:when test="( @key = '0' )"><xsl:value-of select="$value"/></xsl:when>
+            <xsl:when test="( @key = '0' )"><xsl:value-of select="pxrutils:escapeValue( $value )"/></xsl:when>
             <xsl:when test="( @eol = '0' ) and not( $value ) and not( @prefix )">
                 <xsl:text>\</xsl:text>
             </xsl:when>

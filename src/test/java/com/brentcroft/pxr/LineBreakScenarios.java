@@ -25,6 +25,17 @@ public class LineBreakScenarios extends AbstractScenarios
                         "</properties>" );
     }
 
+
+    @Test
+    public void lb_tag_space() throws Exception
+    {
+        runRoundTrip(
+                "\n\t ",
+                "<properties>\n" +
+                        "    <comment key=\"_footer\" lines-before=\"1\" eol=\"0\"><![CDATA[\t ]]></comment>\n" +
+                        "</properties>" );
+    }
+
     @Test
     public void lb() throws Exception
     {
