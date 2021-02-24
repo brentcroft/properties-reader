@@ -433,7 +433,6 @@ class JavaCharStream
 
 /** Constructor.
  * @param dstream the underlying data source.
- * @param startline line number of the first character of the stream, mostly for error messages.
  */
   public JavaCharStream(java.io.Reader dstream)
   {

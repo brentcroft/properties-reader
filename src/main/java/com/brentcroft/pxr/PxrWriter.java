@@ -2,6 +2,7 @@ package com.brentcroft.pxr;
 
 import com.brentcroft.pxr.model.PxrProperties;
 import com.brentcroft.pxr.model.PxrPropertiesRootTag;
+import com.brentcroft.tools.materializer.ContextValue;
 import com.brentcroft.tools.materializer.Materializer;
 import com.brentcroft.tools.materializer.core.TagHandler;
 import lombok.Setter;
@@ -15,12 +16,17 @@ public class PxrWriter
 {
     private PxrProperties pxrProperties;
 
+    private ContextValue contextValue;
+
     public void parse( InputSource inputSource )
     {
         final Materializer< PxrProperties > materializer = new Materializer<>(
                 () -> PxrPropertiesRootTag.ROOT,
                 () -> pxrProperties
         );
+
+        materializer.setContextValue( contextValue );
+
         materializer.apply( inputSource );
     }
 
@@ -36,9 +42,13 @@ public class PxrWriter
 
     public TagHandler< PxrProperties > getDefaultHandler()
     {
-        return new Materializer<>(
+        final Materializer< PxrProperties > materializer = new Materializer<>(
                 () -> PxrPropertiesRootTag.ROOT,
                 () -> pxrProperties
-        ).getDefaultHandler();
+        );
+
+        materializer.setContextValue( contextValue );
+
+        return materializer.getDefaultHandler();
     }
 }

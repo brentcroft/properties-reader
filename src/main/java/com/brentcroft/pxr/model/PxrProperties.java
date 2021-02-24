@@ -41,25 +41,13 @@ public class PxrProperties implements PxrItem
 
         entries.add( entry );
 
+        reIndex();
+
         if ( nonNull( entry.getKey() ) )
         {
             entryMap.put( entry.getKey(), entry );
         }
     }
-
-//    /**
-//     * Clear and rebuild the entry map.
-//     */
-//    public void purge()
-//    {
-//        entryMap.clear();
-//        entries.forEach( this::remap );
-//    }
-//
-//    public void remap( PxrEntry entry )
-//    {
-//        entryMap.put( entry.getKey(), entry );
-//    }
 
     public void remove( String key )
     {
@@ -70,6 +58,8 @@ public class PxrProperties implements PxrItem
             entryMap.remove( key );
             entries.remove( entry );
         }
+
+        reIndex();
     }
 
     public Properties getProperties()
@@ -131,5 +121,14 @@ public class PxrProperties implements PxrItem
                         .map( PxrItem::offset )
                         .orElse( "" )
         );
+    }
+
+    public void reIndex()
+    {
+        int[] index = {0};
+        entries
+                .sort( Comparator.comparingInt( PxrEntry::getIndex ) );
+        entries
+                .forEach( e -> e.setIndex( index[ 0 ]++ ) );
     }
 }

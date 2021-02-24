@@ -40,7 +40,7 @@ public class PxrPropertiesRootTagTest
                             new InputSource(
                                     new FileInputStream( format( "%s/%s", rootDir, uri ) ) ) );
 
-            System.out.println( pxrProperties.jsonate() );
+            //System.out.println( pxrProperties.jsonate() );
         }
     }
 }

@@ -2,6 +2,7 @@ package com.brentcroft.pxr;
 
 import com.brentcroft.pxr.model.*;
 import com.brentcroft.pxr.parser.ParseException;
+import com.brentcroft.tools.materializer.ContextValue;
 import lombok.Getter;
 import lombok.Setter;
 import org.xml.sax.Attributes;
@@ -44,7 +45,7 @@ public class ExPxrWriter extends DefaultHandler implements PxrItem
 
     @Setter
     @Getter
-    private ContextValueMapper contextValueMapper;
+    private ContextValue contextValue;
 
     @Setter
     @Getter
@@ -211,8 +212,8 @@ public class ExPxrWriter extends DefaultHandler implements PxrItem
             pec.setPrefix( prefix );
             pec.setEol( eol );
 
-            pec.setValue( nonNull( contextValueMapper )
-                          ? contextValueMapper
+            pec.setValue( nonNull( contextValue )
+                          ? contextValue
                                   .inContext()
                                   .put( "$index", pec.getIndex() )
                                   .map( key, continuationText.toString() )
@@ -411,8 +412,8 @@ public class ExPxrWriter extends DefaultHandler implements PxrItem
 
     private String mapKeyValue( String key, String newValue, String oldValue )
     {
-        return nonNull( contextValueMapper )
-               ? contextValueMapper
+        return nonNull( contextValue )
+               ? contextValue
                        .inContext()
                        .put( "$value", oldValue )
                        .map( key, newValue )

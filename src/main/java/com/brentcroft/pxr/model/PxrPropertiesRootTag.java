@@ -1,6 +1,8 @@
 package com.brentcroft.pxr.model;
 
+import com.brentcroft.pxr.ExpectationException;
 import com.brentcroft.tools.materializer.core.*;
+import com.brentcroft.tools.materializer.model.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -16,28 +18,58 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
 {
     COMMENT_REMOVE(
             "comment",
-            ( tag ) -> ElementMatcher
+            ( tag ) -> EventMatcher
                     .getDefaultMatcher( tag.getTag() )
-                    .andMatches( ElementMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
-            ( pxrProperties, event ) -> event.getAttributesMap(),
+                    .andMatches( EventMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
+            ( pxrProperties, event ) -> event,
             ( pxrProperties, text, attr ) -> {
 
                 String key = attr.getAttribute( "key" );
+                String expected = attr.getAttribute( "_text", false );
 
                 switch ( key )
                 {
                     case "_header":
+
+                        ExpectationException
+                                .validateExpected(
+                                        key,
+                                        expected,
+                                        ofNullable( pxrProperties.getHeader() )
+                                                .map( PxrComment::getText )
+                                                .orElse( null ) );
+
+
                         pxrProperties.setHeader( null );
                         break;
 
                     case "_footer":
+
+                        ExpectationException
+                                .validateExpected(
+                                        key,
+                                        expected,
+                                        ofNullable( pxrProperties.getFooter() )
+                                                .map( PxrComment::getText )
+                                                .orElse( null ) );
+
                         pxrProperties.setFooter( null );
                         break;
 
                     default:
-                        ofNullable( pxrProperties.getEntryMap().get( key ) )
-                                .orElseThrow( () -> new RuntimeException( "No entry for comment key: " + key ) )
-                                .setComment( null );
+
+                        PxrEntry entry = ofNullable( pxrProperties.getEntryMap().get( key ) )
+                                .orElseThrow( () -> new RuntimeException( "No entry for comment key: " + key ) );
+
+                        ExpectationException
+                                .validateExpected(
+                                        key,
+                                        expected,
+                                        ofNullable( entry.getComment() )
+                                                .map( PxrComment::getText )
+                                                .orElse( null ) );
+
+                        entry.setComment( null );
                 }
             }
     ),
@@ -45,16 +77,16 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
 
     COMMENT(
             "comment",
-            ( tag ) -> ElementMatcher
+            ( tag ) -> EventMatcher
                     .getDefaultMatcher( tag.getTag() )
-                    .andNotMatches( ElementMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
-            ( pxrProperties, event ) -> event.getAttributesMap(),
+                    .andNotMatches( EventMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
+            ( pxrProperties, event ) -> event,
             ( pxrProperties, text, attr ) -> {
 
                 PxrComment pxrComment = new PxrComment();
 
                 attr.applyAttribute( "key", pxrComment::setKey );
-                attr.applyAttribute( "eol", false,"1"::equals, pxrComment::setEol );
+                attr.applyAttribute( "eol", false, "1"::equals, pxrComment::setEol );
                 attr.applyAttribute( "lines-before", false, Integer::parseInt, pxrComment::setLinesBefore );
 
                 if ( nonNull( text ) )
@@ -63,14 +95,33 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
                 }
 
                 String key = pxrComment.getKey();
+                String expected = attr.getAttribute( "_text", false );
 
                 switch ( key )
                 {
                     case "_header":
+
+                        ExpectationException
+                                .validateExpected(
+                                        key,
+                                        expected,
+                                        ofNullable( pxrProperties.getHeader() )
+                                                .map( PxrComment::getText )
+                                                .orElse( null ) );
+
                         pxrProperties.setHeader( pxrComment );
                         break;
 
                     case "_footer":
+
+                        ExpectationException
+                                .validateExpected(
+                                        key,
+                                        expected,
+                                        ofNullable( pxrProperties.getFooter() )
+                                                .map( PxrComment::getText )
+                                                .orElse( null ) );
+
                         pxrProperties.setFooter( pxrComment );
                         break;
 
@@ -81,6 +132,14 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
                         PxrEntry entry = exists
                                          ? pxrProperties.getEntryMap().get( key )
                                          : new PxrEntry();
+
+                        ExpectationException
+                                .validateExpected(
+                                        key,
+                                        expected,
+                                        ofNullable( entry.getComment() )
+                                                .map( PxrComment::getText )
+                                                .orElse( null ) );
 
                         if ( ! exists )
                         {
@@ -96,8 +155,8 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
     ),
     PROPERTIES(
             "*",
-            ( tag ) -> ElementMatcher.getDefaultMatcher( tag.getTag() ),
-            ( pxrProperties, event ) -> event.getAttributesMap(),
+            ( tag ) -> EventMatcher.getDefaultMatcher( tag.getTag() ),
+            ( pxrProperties, event ) -> event,
             ( pxrProperties, text, attr ) -> {
 
                 // ensure there are two line breaks after any header
@@ -146,7 +205,7 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
     private final FlatTag< PxrProperties > self = this;
     private final boolean multiple;
     private final boolean choice;
-    private final ElementMatcher elementMatcher;
+    private final EventMatcher elementMatcher;
     private final FlatCacheOpener< PxrProperties, OpenEvent, ? > opener;
     private final FlatCacheCloser< PxrProperties, String, ? > closer;
     private final Tag< ? super PxrProperties, ? >[] children;
@@ -160,7 +219,7 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
     @SafeVarargs
     PxrPropertiesRootTag(
             String tag,
-            Function< Tag< ?, ? >, ElementMatcher > elementMatcher,
+            Function< Tag< ?, ? >, EventMatcher > elementMatcher,
             BiFunction< PxrProperties, OpenEvent, AttributesMap > opener,
             TriConsumer< PxrProperties, String, AttributesMap > closer,
             Tag< ? super PxrProperties, ? >... children
@@ -169,7 +228,7 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
         this.tag = tag;
         this.multiple = isNull( children ) || children.length == 0;
         this.elementMatcher = isNull( elementMatcher )
-                              ? ElementMatcher.getDefaultMatcher( getTag() )
+                              ? EventMatcher.getDefaultMatcher( getTag() )
                               : elementMatcher.apply( this );
         this.opener = Opener.flatCacheOpener( opener );
         this.closer = Closer.flatCacheCloser( closer );
@@ -183,20 +242,37 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
 {
     ENTRY_REMOVE(
             "entry",
-            ( tag ) -> ElementMatcher
+            ( tag ) -> EventMatcher
                     .getDefaultMatcher( tag.getTag() )
-                    .andMatches( ElementMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
-            ( pxrProperties, pxrEntry, event ) -> event.getAttributesMap(),
-            ( pxrProperties, pxrEntry, text, attr ) -> pxrProperties.remove( attr.getAttribute( "key" ) )
+                    .andMatches( EventMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
+            ( pxrProperties, pxrEntry, event ) -> event,
+            ( pxrProperties, pxrEntry, text, attr ) -> {
+
+                String key = attr.getAttribute( "key" );
+                String expected = attr.getAttribute( "_text", false );
+                ExpectationException.validateExpected( key, expected, pxrEntry.getText() );
+
+                pxrProperties.remove( key );
+            }
     ),
 
     ENTRY(
             "entry",
-            ( tag ) -> ElementMatcher
+
+            ( tag ) -> EventMatcher
                     .getDefaultMatcher( tag.getTag() )
-                    .andNotMatches( ElementMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
-            ( pxrProperties, pxrEntry, event ) -> event.getAttributesMap(),
-            ( pxrProperties, pxrEntry, text, attr ) -> {
+                    .andNotMatches( EventMatcher.getNamespaceMatcher( PxrItem.EXPECTED_NAMESPACE_URI ) ),
+
+            ( pxrProperties, pxrEntry, event ) -> {
+                event.putContextValue( "$value", pxrEntry.getText() );
+                return event;
+            },
+
+            ( pxrProperties, pxrEntry, text, event ) -> {
+
+                String key = event.getAttribute( "key" );
+                String expected = event.getAttribute( "_text", false );
+                ExpectationException.validateExpected( key, expected, pxrEntry.getText() );
 
                 if ( nonNull( text ) && text.length() > 0 && text.trim().length() > 0 )
                 {
@@ -215,7 +291,7 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
     private final StepTag< PxrProperties, PxrEntry > self = this;
     private final boolean multiple;
     private final boolean choice;
-    private final ElementMatcher elementMatcher;
+    private final EventMatcher elementMatcher;
     private final Opener< PxrProperties, PxrEntry, OpenEvent, AttributesMap > opener;
     private final Closer< PxrProperties, PxrEntry, String, AttributesMap > closer;
     private final Tag< ? super PxrEntry, ? >[] children;
@@ -223,7 +299,7 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
 
     @SafeVarargs
     EntryTag( String tag,
-              Function< Tag< PxrProperties, PxrEntry >, ElementMatcher > elementMatcher,
+              Function< Tag< PxrProperties, PxrEntry >, EventMatcher > elementMatcher,
               Opener< PxrProperties, PxrEntry, OpenEvent, AttributesMap > opener,
               Closer< PxrProperties, PxrEntry, String, AttributesMap > closer,
               Tag< ? super PxrEntry, ? >... children )
@@ -240,9 +316,7 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
     @Override
     public PxrEntry getItem( PxrProperties pxrProperties, OpenEvent event )
     {
-        AttributesMap attr = event.getAttributesMap();
-
-        String key = attr.getAttribute( "key" );
+        String key = event.getAttribute( "key" );
 
         boolean exists = pxrProperties
                 .getEntryMap()
@@ -252,15 +326,17 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
                             ? pxrProperties.getEntryMap().get( key )
                             : new PxrEntry();
 
-        attr.applyAttribute( "key", pxrEntry::setKey );
-        attr.applyAttribute( "eol", false, true, "1"::equals, pxrEntry::setEol );
-        attr.applyAttribute( "index", pxrProperties.getEntries().size(), Integer::parseInt, pxrEntry::setIndex );
-        attr.applyAttribute( "sep", "=", pxrEntry::setSep );
+        event.applyAttribute( "key", pxrEntry::setKey );
+        event.applyAttribute( "eol", false, true, "1"::equals, pxrEntry::setEol );
+        event.applyAttribute( "index", pxrProperties.getEntries().size(), Integer::parseInt, pxrEntry::setIndex );
+        event.applyAttribute( "sep", "=", pxrEntry::setSep );
 
         if ( ! exists )
         {
             pxrProperties.append( pxrEntry );
         }
+
+        pxrProperties.reIndex();
 
         return pxrEntry;
     }
@@ -273,7 +349,7 @@ enum TextTag implements FlatTag< PxrEntry >
     TEXT(
             "text",
 
-            ( pxrEntry, event ) -> event.getAttributesMap(),
+            ( pxrEntry, event ) -> event,
             ( pxrEntry, text, attr ) -> {
 
                 PxrEntryContinuation pec = new PxrEntryContinuation();
