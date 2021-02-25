@@ -1,11 +1,11 @@
 <properties>
     <comment key="_header"><![CDATA[# this file saved as ISO_8859_1]]></comment>
     <comment key="quotes_1" lines-before="1"><![CDATA[# double-quotes]]></comment>
-    <entry key="quotes_1" index="1" sep=" = ">"what"</entry>
+    <entry key="quotes_1" index="0" sep=" = ">"what"</entry>
     <comment key="quotes_2" lines-before="1"><![CDATA[# v-double-quotes]]></comment>
-    <entry key="quotes_2" index="2" sep=" = ">"what"</entry>
+    <entry key="quotes_2" index="1" sep=" = ">"what"</entry>
     <comment key="quotes_3" lines-before="1"><![CDATA[# single-quotes]]></comment>
-    <entry key="quotes_3" index="3" sep=" = ">"what"</entry>
+    <entry key="quotes_3" index="2" sep=" = ">"what"</entry>
     <comment key="ticks_1" lines-before="1"><![CDATA[# ticks]]></comment>
-    <entry key="ticks_1" index="4" sep=" = ">`what`</entry>
+    <entry key="ticks_1" index="3" sep=" = ">`what`</entry>
 </properties>

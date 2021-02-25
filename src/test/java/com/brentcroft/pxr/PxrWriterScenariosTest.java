@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
 import static com.brentcroft.pxr.fixtures.Utils.EPILOG;
 import static com.brentcroft.pxr.fixtures.Utils.PROLOG;
 
-public class PxrWriterScenarios extends AbstractScenarios
+public class PxrWriterScenariosTest extends AbstractScenarios
 {
     @Test
     public void round_trip() throws TransformerException, ParseException, UnsupportedEncodingException
@@ -37,11 +37,11 @@ public class PxrWriterScenarios extends AbstractScenarios
                         "        <![CDATA[#sample header]]>\n" +
                         "    </comment>\n" +
                         "    <comment key='color'/>\n" +
-                        "    <entry key='color' index='1'>red</entry>\n" +
+                        "    <entry key='color' index='0'>red</entry>\n" +
                         "    <comment key='size' lines-before='1'>\n" +
                         "        <![CDATA[#the size is large]]>\n" +
                         "    </comment>\n" +
-                        "    <entry key='size' index='2'>large</entry>\n" +
+                        "    <entry key='size' index='1'>large</entry>\n" +
                         "    <comment key='_footer' lines-before='1' eol='0'>\n" +
                         "        <![CDATA[#sample footer]]>\n" +
                         "    </comment>\n" +

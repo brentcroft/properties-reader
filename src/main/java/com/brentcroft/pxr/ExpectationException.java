@@ -32,6 +32,7 @@ public class ExpectationException extends RuntimeException
         if ( nonNull( expected ) )
         {
             ofNullable( actual )
+                    .map( String::trim )
                     .filter( expected::equals )
                     .orElseThrow( () -> new ExpectationException( key, expected, actual ) );
         }

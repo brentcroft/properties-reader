@@ -3,7 +3,7 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-public class WhitespaceScenarios extends AbstractScenarios
+public class WhitespaceScenariosTest extends AbstractScenarios
 {
     @Test
     public void empty() throws Exception

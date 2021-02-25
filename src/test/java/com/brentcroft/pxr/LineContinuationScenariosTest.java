@@ -3,7 +3,7 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-public class LineContinuationScenarios extends AbstractScenarios
+public class LineContinuationScenariosTest extends AbstractScenarios
 {
 
     @Test
@@ -21,7 +21,7 @@ public class LineContinuationScenarios extends AbstractScenarios
                 "<properties>\n" +
                         "    <comment key='_header'><![CDATA[# xxx]]></comment>\n" +
                         "    <comment key='a' lines-before='1'><![CDATA[# double continuation]]></comment>\n" +
-                        "    <entry key='a' index='1' sep=' = '>\n" +
+                        "    <entry key='a' index='0' sep=' = '>\n" +
                         "        <text key='0'>b </text>\n" +
                         "        <text key='1' prefix='  '/>\n" +
                         "        <text key='2' prefix='   '>c d e</text>\n" +
@@ -46,7 +46,7 @@ public class LineContinuationScenarios extends AbstractScenarios
                 "<properties>\n" +
                         "    <comment key='_header'><![CDATA[# xx=x!x asdasd]]></comment>\n" +
                         "    <comment key='a' lines-before='1'><![CDATA[# double continuation]]></comment>\n" +
-                        "    <entry key='a' index='1' sep=' = '>\n" +
+                        "    <entry key='a' index='0' sep=' = '>\n" +
                         "        <text key='0'>b </text>\n" +
                         "        <text key='1' prefix='  '/>\n" +
                         "        <text key='2' prefix='   '>c d e</text>\n" +

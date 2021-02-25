@@ -3,7 +3,7 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-public class MultiEntryScenarios extends AbstractScenarios
+public class MultiEntryScenariosTest extends AbstractScenarios
 {
 
     @Test
@@ -15,7 +15,7 @@ public class MultiEntryScenarios extends AbstractScenarios
 
                 "<properties>\n" +
                         "    <comment key='a'/>\n" +
-                        "    <entry key='a' index='1' sep=' = ' eol='0'>b + c</entry>\n" +
+                        "    <entry key='a' index='0' sep=' = ' eol='0'>b + c</entry>\n" +
                         "</properties>"
         );
     }
@@ -29,8 +29,8 @@ public class MultiEntryScenarios extends AbstractScenarios
                 "a = b + c\nd = e + f\n",
 
                 "<properties>\n" +
-                        "    <entry key='a' index='1' sep=' = '>b + c</entry>\n" +
-                        "    <entry key='d' index='2' sep=' = '>e + f</entry>\n" +
+                        "    <entry key='a' index='0' sep=' = '>b + c</entry>\n" +
+                        "    <entry key='d' index='1' sep=' = '>e + f</entry>\n" +
                         "</properties>"
         );
     }
@@ -45,10 +45,10 @@ public class MultiEntryScenarios extends AbstractScenarios
 
                 "<properties>\n" +
                         "    <comment key='x' lines-before='1'/>\n" +
-                        "    <entry key='x' index='1'>y</entry>\n" +
-                        "    <entry key='y' index='2'>z</entry>\n" +
-                        "    <entry key='z' index='3'>a</entry>\n" +
-                        "    <entry key='a' index='4'>b</entry>\n" +
+                        "    <entry key='x' index='0'>y</entry>\n" +
+                        "    <entry key='y' index='1'>z</entry>\n" +
+                        "    <entry key='z' index='2'>a</entry>\n" +
+                        "    <entry key='a' index='3'>b</entry>\n" +
                         "    <comment key='_footer'/>\n" +
                         "</properties>"
         );

@@ -3,7 +3,7 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-public class LineBreakScenarios extends AbstractScenarios
+public class LineBreakScenariosTest extends AbstractScenarios
 {
     @Test
     public void lb_space_5() throws Exception

@@ -3,7 +3,7 @@ package com.brentcroft.pxr;
 import com.brentcroft.pxr.fixtures.AbstractScenarios;
 import org.junit.Test;
 
-public class EscapeScenarios extends AbstractScenarios
+public class EscapeScenariosTest extends AbstractScenarios
 {
 
     @Test
@@ -13,11 +13,11 @@ public class EscapeScenarios extends AbstractScenarios
                 .properties_text( "a\\qb=c\n" );
 
         when()
-                .transform_text_to_xml_text( );
+                .transform_text_to_xml_text();
 
         then()
                 .xml_text_equals( "<properties>\n" +
-                        "    <entry key='aqb' index='1'>c</entry>\n" +
+                        "    <entry key='aqb' index='0'>c</entry>\n" +
                         "</properties>" );
 
         when()
@@ -27,11 +27,11 @@ public class EscapeScenarios extends AbstractScenarios
                 .transform_result_is( "aqb=c\n" );
 
         when()
-                .transform_text_to_xml_text(  );
+                .transform_text_to_xml_text();
 
         then()
                 .xml_text_equals( "<properties>\n" +
-                        "    <entry key='aqb' index='1'>c</entry>\n" +
+                        "    <entry key='aqb' index='0'>c</entry>\n" +
                         "</properties>" );
     }
 
@@ -42,11 +42,11 @@ public class EscapeScenarios extends AbstractScenarios
                 .properties_text( "a\\/b=c\n" );
 
         when()
-                .transform_text_to_xml_text( );
+                .transform_text_to_xml_text();
 
         then()
                 .xml_text_equals( "<properties>\n" +
-                        "    <entry key='a/b' index='1'>c</entry>\n" +
+                        "    <entry key='a/b' index='0'>c</entry>\n" +
                         "</properties>" );
 
         when()
@@ -56,11 +56,11 @@ public class EscapeScenarios extends AbstractScenarios
                 .transform_result_is( "a/b=c\n" );
 
         when()
-                .transform_text_to_xml_text(  );
+                .transform_text_to_xml_text();
 
         then()
                 .xml_text_equals( "<properties>\n" +
-                        "    <entry key='a/b' index='1'>c</entry>\n" +
+                        "    <entry key='a/b' index='0'>c</entry>\n" +
                         "</properties>" );
     }
 
@@ -70,7 +70,7 @@ public class EscapeScenarios extends AbstractScenarios
         runRoundTrip(
                 "a\\=b=c\n",
                 "<properties>\n" +
-                        "    <entry key='a=b' index='1'>c</entry>\n" +
+                        "    <entry key='a=b' index='0'>c</entry>\n" +
                         "</properties>" );
     }
 
@@ -81,7 +81,7 @@ public class EscapeScenarios extends AbstractScenarios
         runRoundTrip(
                 "a\\:b=c\n",
                 "<properties>\n" +
-                        "    <entry key='a:b' index='1'>c</entry>\n" +
+                        "    <entry key='a:b' index='0'>c</entry>\n" +
                         "</properties>" );
     }
 
@@ -92,7 +92,7 @@ public class EscapeScenarios extends AbstractScenarios
         runRoundTrip(
                 "a\\ b=c\n",
                 "<properties>\n" +
-                        "    <entry key='a b' index='1'>c</entry>\n" +
+                        "    <entry key='a b' index='0'>c</entry>\n" +
                         "</properties>" );
     }
 }

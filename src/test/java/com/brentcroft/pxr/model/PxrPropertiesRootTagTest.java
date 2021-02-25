@@ -4,7 +4,6 @@ import com.brentcroft.tools.materializer.Materializer;
 import org.junit.Test;
 import org.xml.sax.InputSource;
 
-import javax.xml.validation.Schema;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -26,21 +25,27 @@ public class PxrPropertiesRootTagTest
     {
         //Schema schema = Materializer.getSchemas( xsdUri );
 
+        PxrProperties pxrProperties = new PxrProperties();
+
         Materializer< PxrProperties > materializer = new Materializer<>(
 //                schema,
 //                0,
                 () -> PxrPropertiesRootTag.ROOT,
-                PxrProperties::new
+                () -> pxrProperties
         );
 
         for ( String uri : uris )
         {
-            PxrProperties pxrProperties = materializer
+            String systemId = format( "%s/%s", rootDir, uri );
+
+            pxrProperties.setSystemId( systemId );
+
+            materializer
                     .apply(
                             new InputSource(
                                     new FileInputStream( format( "%s/%s", rootDir, uri ) ) ) );
 
-            //System.out.println( pxrProperties.jsonate() );
+            System.out.println( pxrProperties.jsonate() );
         }
     }
 }

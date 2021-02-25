@@ -7,20 +7,20 @@
 # a preceding backslash to ensure that they are properly loaded.
 # However, there is no need to precede the value characters =, and : by a backslash.]]>
     </comment>
-    <entry key="website" index="1" sep=" = ">https://en.wikipedia.org/</entry>
-    <entry key="language" index="2" sep=" = ">English</entry>
+    <entry key="website" index="0" sep=" = ">https://en.wikipedia.org/</entry>
+    <entry key="language" index="1" sep=" = ">English</entry>
     <comment key="message">
         <![CDATA[# The backslash below tells the application to continue reading
 # the value onto the next line.]]>
     </comment>
-    <entry key="message" index="3" sep=" = ">
+    <entry key="message" index="2" sep=" = ">
         <text key="0">Welcome to </text>
         <text key="1" prefix="          ">Wikipedia!</text>
     </entry>
     <comment key="key">
         <![CDATA[# But if the number of backslashes at the end of the line is even, the next line is not included in the value. In the following example, the value for "key" is "valueOverOneLine\"]]>
     </comment>
-    <entry key="key" index="4" sep=" = ">
+    <entry key="key" index="3" sep=" = ">
         <text key="0">valueOverOneLine\</text>
         <text key="1" eol="0"/>
     </entry>
@@ -28,19 +28,19 @@
         <![CDATA[# This line is not included in the value for "key"
 # Add spaces to the key]]>
     </comment>
-    <entry key="key with spaces" index="5" sep=" = ">This is the value that could be looked up with the key "key with spaces".</entry>
+    <entry key="key with spaces" index="4" sep=" = ">This is the value that could be looked up with the key "key with spaces".</entry>
     <comment key="key:with=colonAndEqualsSign">
         <![CDATA[# Similarly, if you want, that the key contains the characters = or :, they must be escaped as well:]]>
     </comment>
-    <entry key="key:with=colonAndEqualsSign" index="6" sep=" = ">This is the value for the key "key:with=colonAndEqualsSign"</entry>
+    <entry key="key:with=colonAndEqualsSign" index="5" sep=" = ">This is the value for the key "key:with=colonAndEqualsSign"</entry>
     <comment key="tab">
         <![CDATA[# Unicode]]>
     </comment>
-    <entry key="tab" index="7" sep=" : ">\u0009</entry>
+    <entry key="tab" index="6" sep=" : ">\u0009</entry>
     <comment key="path" lines-before="1">
         <![CDATA[# If you want your property to include a backslash, it should be escaped by another backslash]]>
     </comment>
-    <entry key="path" index="8">c:\\wiki\\templates</entry>
+    <entry key="path" index="7">c:\\wiki\\templates</entry>
     <comment key="_footer" eol="0">
         <![CDATA[# However, some editors will handle this automatically]]>
     </comment>

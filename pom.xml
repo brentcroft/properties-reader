@@ -116,6 +116,22 @@
                 <version>3.1.0</version>
             </plugin>
 
+            <plugin>
+                <groupId>com.tngtech.jgiven</groupId>
+                <artifactId>jgiven-maven-plugin</artifactId>
+                <version>0.18.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <format>text</format>
+                    <outputDirectory>src/test/reports</outputDirectory>
+                </configuration>
+            </plugin>
 
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>

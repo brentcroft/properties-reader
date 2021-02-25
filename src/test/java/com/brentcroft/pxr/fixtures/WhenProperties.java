@@ -53,7 +53,7 @@ public class WhenProperties extends Stage< WhenProperties >
         return self();
     }
 
-    public WhenProperties transform_xml_to_properties_text() throws TransformerException, UnsupportedEncodingException
+    public WhenProperties transform_xml_to_properties_text() throws TransformerException
     {
         Writer baos = CRFilterWriter.from( new StringWriter() );
 

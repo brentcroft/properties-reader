@@ -1,11 +1,17 @@
 package com.brentcroft.pxr.model;
 
 import com.brentcroft.pxr.ExpectationException;
+import com.brentcroft.tools.materializer.Materializer;
 import com.brentcroft.tools.materializer.core.*;
 import com.brentcroft.tools.materializer.model.*;
 import lombok.Getter;
+import org.xml.sax.InputSource;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -157,7 +163,7 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
             "*",
             ( tag ) -> EventMatcher.getDefaultMatcher( tag.getTag() ),
             ( pxrProperties, event ) -> event,
-            ( pxrProperties, text, attr ) -> {
+            ( pxrProperties, text, event ) -> {
 
                 // ensure there are two line breaks after any header
                 ofNullable( pxrProperties.getHeader() )
@@ -199,10 +205,9 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
             COMMENT_REMOVE,
             COMMENT
     ),
-    ROOT( "", PROPERTIES );
+    ROOT( "", PxrJumpTag.PROPERTIES, PROPERTIES );
 
     private final String tag;
-    private final FlatTag< PxrProperties > self = this;
     private final boolean multiple;
     private final boolean choice;
     private final EventMatcher elementMatcher;
@@ -288,7 +293,6 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
             TextTag.TEXT );
 
     private final String tag;
-    private final StepTag< PxrProperties, PxrEntry > self = this;
     private final boolean multiple;
     private final boolean choice;
     private final EventMatcher elementMatcher;
@@ -328,7 +332,12 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
 
         event.applyAttribute( "key", pxrEntry::setKey );
         event.applyAttribute( "eol", false, true, "1"::equals, pxrEntry::setEol );
-        event.applyAttribute( "index", pxrProperties.getEntries().size(), Integer::parseInt, pxrEntry::setIndex );
+        event.applyAttribute(
+                "index",
+                exists ? pxrEntry.getIndex() : pxrProperties.getEntries().size(),
+                Integer::parseInt,
+                pxrEntry::setIndex );
+
         event.applyAttribute( "sep", "=", pxrEntry::setSep );
 
         if ( ! exists )
@@ -373,7 +382,6 @@ enum TextTag implements FlatTag< PxrEntry >
     );
 
     private final String tag;
-    private final FlatTag< PxrEntry > self = this;
     private final boolean multiple = true;
     private final FlatCacheOpener< PxrEntry, OpenEvent, ? > opener;
     private final FlatCacheCloser< PxrEntry, String, ? > closer;
@@ -385,5 +393,65 @@ enum TextTag implements FlatTag< PxrEntry >
         this.tag = tag;
         this.opener = Opener.flatCacheOpener( opener );
         this.closer = Closer.flatCacheCloser( closer );
+    }
+}
+
+
+@Getter
+enum PxrJumpTag implements JumpTag< PxrProperties, PxrProperties >
+{
+    PROPERTIES(
+            "properties",
+            ( pxr, event ) -> event
+                    .onHasAttributeAnd(
+                            "src",
+                            () -> event.notOnStack( PxrPropertiesRootTag.ROOT ),
+                            () -> new Materializer<>(
+                                    () -> PxrPropertiesRootTag.ROOT,
+                                    () -> pxr,
+                                    event.stackInContext( PxrPropertiesRootTag.ROOT ) )
+                                    .apply( getInputSource( pxr, event ) ) ),
+            PxrPropertiesRootTag.PROPERTIES
+    );
+
+    private final String tag;
+    private final FlatOpener< PxrProperties, OpenEvent > opener;
+    private final Tag< ? super PxrProperties, ? >[] children;
+
+    @SafeVarargs
+    PxrJumpTag(
+            String tag,
+            BiConsumer< PxrProperties, OpenEvent > opener,
+            Tag< ? super PxrProperties, ? >... children )
+    {
+        this.tag = tag;
+        this.opener = Opener.flatOpener( opener );
+        this.children = children;
+    }
+
+    @Override
+    public PxrProperties getItem( PxrProperties topology, OpenEvent event )
+    {
+        return topology;
+    }
+
+    static InputSource getInputSource( PxrProperties pxr, OpenEvent event )
+    {
+        try
+        {
+            File directory = isNull( pxr.getSystemId() )
+                             ? null
+                             : new File( pxr.getSystemId() ).getParentFile();
+
+            String filename = event.getAttribute( "src" );
+
+            return new InputSource(
+                    new FileInputStream(
+                            new File( directory, filename ) ) );
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new RuntimeException( e );
+        }
     }
 }
