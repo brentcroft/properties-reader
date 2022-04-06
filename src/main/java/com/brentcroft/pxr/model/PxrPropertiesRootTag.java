@@ -225,8 +225,8 @@ public enum PxrPropertiesRootTag implements FlatTag< PxrProperties >
     PxrPropertiesRootTag(
             String tag,
             Function< Tag< ?, ? >, EventMatcher > elementMatcher,
-            BiFunction< PxrProperties, OpenEvent, AttributesMap > opener,
-            TriConsumer< PxrProperties, String, AttributesMap > closer,
+            BiFunction< PxrProperties, OpenEvent, Attribution > opener,
+            TriConsumer< PxrProperties, String, Attribution > closer,
             Tag< ? super PxrProperties, ? >... children
     )
     {
@@ -296,16 +296,16 @@ enum EntryTag implements StepTag< PxrProperties, PxrEntry >
     private final boolean multiple;
     private final boolean choice;
     private final EventMatcher elementMatcher;
-    private final Opener< PxrProperties, PxrEntry, OpenEvent, AttributesMap > opener;
-    private final Closer< PxrProperties, PxrEntry, String, AttributesMap > closer;
+    private final Opener< PxrProperties, PxrEntry, OpenEvent, Attribution > opener;
+    private final Closer< PxrProperties, PxrEntry, String, Attribution > closer;
     private final Tag< ? super PxrEntry, ? >[] children;
 
 
     @SafeVarargs
     EntryTag( String tag,
               Function< Tag< PxrProperties, PxrEntry >, EventMatcher > elementMatcher,
-              Opener< PxrProperties, PxrEntry, OpenEvent, AttributesMap > opener,
-              Closer< PxrProperties, PxrEntry, String, AttributesMap > closer,
+              Opener< PxrProperties, PxrEntry, OpenEvent, Attribution > opener,
+              Closer< PxrProperties, PxrEntry, String, Attribution > closer,
               Tag< ? super PxrEntry, ? >... children )
     {
         this.tag = tag;
@@ -387,8 +387,8 @@ enum TextTag implements FlatTag< PxrEntry >
     private final FlatCacheCloser< PxrEntry, String, ? > closer;
 
     TextTag( String tag,
-             BiFunction< PxrEntry, OpenEvent, AttributesMap > opener,
-             TriConsumer< PxrEntry, String, AttributesMap > closer )
+             BiFunction< PxrEntry, OpenEvent, Attribution > opener,
+             TriConsumer< PxrEntry, String, Attribution > closer )
     {
         this.tag = tag;
         this.opener = Opener.flatCacheOpener( opener );
@@ -430,9 +430,9 @@ enum PxrJumpTag implements JumpTag< PxrProperties, PxrProperties >
     }
 
     @Override
-    public PxrProperties getItem( PxrProperties topology, OpenEvent event )
+    public PxrProperties getItem( PxrProperties pxr, OpenEvent event )
     {
-        return topology;
+        return pxr;
     }
 
     static InputSource getInputSource( PxrProperties pxr, OpenEvent event )
